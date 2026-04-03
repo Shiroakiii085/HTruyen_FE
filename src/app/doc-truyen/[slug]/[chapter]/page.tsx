@@ -20,7 +20,7 @@ export default function Reader() {
   const [images, setImages] = useState<any[]>([]);
   const [imageDomain, setImageDomain] = useState('');
   const [chapterPath, setChapterPath] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);   
   const [showControls, setShowControls] = useState(true);
   const [progress, setProgress] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -82,8 +82,8 @@ export default function Reader() {
   }, [user, slug, chapterName, apiUrl]);
 
   const currentIndex = chapterList.findIndex(c => c.chapter_name === chapterName);
-  const nextChapter = currentIndex > 0 ? chapterList[currentIndex - 1] : null;
-  const prevChapter = currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1] : null;
+  const nextChapter = currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1] : null;
+  const prevChapter = currentIndex > 0 ? chapterList[currentIndex - 1] : null;
 
   const navigateToChapter = (chapter: any) => {
     if (!chapter) return;
@@ -311,12 +311,26 @@ export default function Reader() {
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
         
         <div className="flex items-center gap-4 w-full">
+          {prevChapter ? (
+            <button 
+              onClick={() => navigateToChapter(prevChapter)}
+              className="flex-1 glass group hover:bg-white/10 p-6 rounded-3xl transition-all border border-white/5 flex flex-col items-start gap-2"
+            >
+              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">← Chương trước</span>
+              <span className="text-text-main font-black group-hover:text-accent transition-colors">Chương {prevChapter.chapter_name}</span>
+            </button>
+          ) : (
+             <div className="flex-1 glass p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center opacity-40">
+              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">Không có chương trước</span>
+            </div>
+          )}
+
           {nextChapter ? (
             <button 
               onClick={() => navigateToChapter(nextChapter)}
-              className="flex-[2] bg-accent group hover:scale-[1.02] p-6 rounded-3xl transition-all border border-white/10 flex flex-col items-start gap-2 shadow-xl shadow-accent/20"
+              className="flex-[2] bg-accent group hover:scale-[1.02] p-6 rounded-3xl transition-all border border-white/10 flex flex-col items-end gap-2 shadow-xl shadow-accent/20"
             >
-              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">← Chương sau (i+1)</span>
+              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">Chương sau →</span>
               <span className="text-white font-black">Chương {nextChapter.chapter_name}</span>
             </button>
           ) : (
@@ -324,16 +338,6 @@ export default function Reader() {
               <span className="text-[10px] font-black text-accent uppercase tracking-widest">Đã hết chương</span>
               <span className="text-text-dim font-bold text-xs">Hãy quay lại sau!</span>
             </div>
-          )}
-
-          {prevChapter && (
-            <button 
-              onClick={() => navigateToChapter(prevChapter)}
-              className="flex-1 glass group hover:bg-white/10 p-6 rounded-3xl transition-all border border-white/5 flex flex-col items-end gap-2"
-            >
-              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">Chương trước (i-1) →</span>
-              <span className="text-text-main font-black group-hover:text-accent transition-colors">Chương {prevChapter.chapter_name}</span>
-            </button>
           )}
         </div>
       </div>
