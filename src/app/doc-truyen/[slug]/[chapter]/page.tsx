@@ -14,7 +14,7 @@ export default function Reader() {
   const slug = params.slug as string;
   const chapterName = params.chapter as string;
   const apiUrl = searchParams.get('api');
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, isLoading } = useAuth();
   const [mounted, setMounted] = useState(false);
   
   const [images, setImages] = useState<any[]>([]);
@@ -179,10 +179,11 @@ export default function Reader() {
     );
   }
 
-  if (mounted && !user) {
+  // Handle login requirement after mounting and ensuring auth rehydration is complete
+  if (mounted && !isLoading && !user) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-primary-bg space-y-8 p-6 text-center">
-        <div className="glass p-10 rounded-3xl space-y-6 max-w-sm">
+      <div className="min-h-screen bg-primary-bg flex items-center justify-center p-4">
+        <div className="glass p-10 rounded-3xl space-y-6 max-w-sm text-center">
            <h2 className="text-xl font-black text-white uppercase tracking-widest">YÊU CẦU ĐĂNG NHẬP</h2>
            <p className="text-text-muted text-sm font-medium">Bạn cần đăng nhập để có thể đọc truyện và tích lũy Cảnh giới!</p>
            <button onClick={() => router.push('/auth/login')} className="w-full bg-accent text-white py-4 rounded-2xl font-black hover:scale-105 transition-all shadow-xl shadow-accent/20">ĐĂNG NHẬP NGAY</button>
