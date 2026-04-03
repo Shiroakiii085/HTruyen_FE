@@ -25,6 +25,7 @@ export default function Reader() {
   const [progress, setProgress] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [chapterList, setChapterList] = useState<any[]>([]);
+  const [comicInfo, setComicInfo] = useState<any>(null);
   const [isChapterMenuOpen, setIsChapterMenuOpen] = useState(false);
   const [chapterSearch, setChapterSearch] = useState('');
   const lastScrollY = useRef(0);
@@ -38,6 +39,7 @@ export default function Reader() {
         if (res.status === 'success') {
           const allChapters = res.data.item.chapters?.[0]?.server_data || [];
           setChapterList(allChapters);
+          setComicInfo(res.data.item);
         }
       } catch (err) {
         console.error('Error fetching chapter list:', err);
@@ -75,15 +77,28 @@ export default function Reader() {
 
     api.post('/History', {
       comicSlug: slug,
+      comicName: comicInfo?.name || slug,
+      thumbUrl: comicInfo?.thumb_url || '',
       chapterName: chapterName,
       chapterApiData: apiUrl,
       scrollPosition: 0
     }).catch(err => console.error('History API error:', err));
-  }, [user, slug, chapterName, apiUrl]);
+  }, [user, slug, chapterName, apiUrl, comicInfo]);
 
   const currentIndex = chapterList.findIndex(c => c.chapter_name === chapterName);
-  const nextChapter = currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1] : null;
-  const prevChapter = currentIndex > 0 ? chapterList[currentIndex - 1] : null;
+  
+  // Detect if the chapter list is ascending or descending based on first and last available chapters
+  const isAscending = chapterList.length > 1 && 
+    (parseFloat(chapterList[chapterList.length - 1].chapter_name) || 0) > (parseFloat(chapterList[0].chapter_name) || 0);
+
+  // If ascending: next is i+1, prev is i-1. If descending: next is i-1, prev is i+1.
+  const nextChapter = isAscending 
+    ? (currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1] : null)
+    : (currentIndex > 0 ? chapterList[currentIndex - 1] : null);
+
+  const prevChapter = isAscending
+    ? (currentIndex > 0 ? chapterList[currentIndex - 1] : null)
+    : (currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1] : null);
 
   const navigateToChapter = (chapter: any) => {
     if (!chapter) return;

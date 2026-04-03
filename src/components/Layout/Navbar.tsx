@@ -92,8 +92,8 @@ export default function Navbar() {
                   <Link href="/profile" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
                     <FaUser className="mr-3 opacity-70" /> Hồ sơ cá nhân
                   </Link>
-                  <Link href="/bookmarks" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
-                    <FaBook className="mr-3 opacity-70" /> Tủ truyện
+                  <Link href="/lich-su" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
+                    <FaBook className="mr-3 opacity-70" /> Truyện đã đọc
                   </Link>
                   <div className="mx-2 my-1 border-t border-white/5"></div>
                   <button onClick={logout} className="w-full flex items-center px-4 py-2.5 text-sm text-red-400/80 hover:text-red-400 hover:bg-red-400/5 transition-all">
@@ -167,7 +167,7 @@ export default function Navbar() {
 
                 <div className="space-y-2">
                   <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaUser className="mr-3 text-accent" /> Hồ sơ cá nhân</Link>
-                  <Link href="/bookmarks" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaBook className="mr-3 text-accent" /> Tủ truyện</Link>
+                  <Link href="/lich-su" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaBook className="mr-3 text-accent" /> Truyện đã đọc</Link>
                   <button onClick={logout} className="w-full flex items-center py-3 px-4 bg-red-400/5 text-red-400 rounded-xl text-sm font-bold"><FaSignOutAlt className="mr-3" /> Đăng xuất</button>
                 </div>
              </div>
