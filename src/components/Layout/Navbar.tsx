@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { FaSearch, FaUser, FaSignOutAlt, FaBook, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaUser, FaSignOutAlt, FaBook, FaBars, FaTimes, FaStar } from 'react-icons/fa';
+import { getRealmInfo } from '@/utils/levelSystem';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -11,6 +12,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const realmInfo = user ? getRealmInfo(user.level || 1, user.exp || 0) : null;
 
   if (pathname?.startsWith('/doc-truyen/')) {
     return null;
@@ -74,9 +77,20 @@ export default function Navbar() {
                   <div className="px-4 py-2 border-b border-white/5 mb-1">
                     <p className="text-xs text-text-dim font-medium uppercase tracking-tighter">Tài khoản</p>
                     <p className="text-sm text-text-main font-bold truncate">{user.username}</p>
+                    {realmInfo && (
+                      <div className="mt-2">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-[10px] font-black text-accent uppercase tracking-widest">{realmInfo.name}</span>
+                          <span className="text-[10px] text-text-muted">{realmInfo.isMax ? 'MAX' : `${realmInfo.currentExp}/${realmInfo.requiredExp}`}</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full bg-accent transition-all duration-300" style={{ width: `${realmInfo.progressPercent}%` }}></div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <Link href="/profile" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
-                    <FaUser className="mr-3 opacity-70" /> Cá nhân
+                    <FaUser className="mr-3 opacity-70" /> Hồ sơ cá nhân
                   </Link>
                   <Link href="/bookmarks" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
                     <FaBook className="mr-3 opacity-70" /> Tủ truyện
@@ -128,16 +142,32 @@ export default function Navbar() {
           </div>
           {user ? (
              <div className="pt-4 border-t border-white/5">
-                <div className="flex items-center space-x-4 mb-5 p-3 bg-white/5 rounded-2xl">
-                  <img src={user.avatar} className="w-12 h-12 rounded-xl border-2 border-accent/30 shadow-lg" alt="avatar" />
-                  <div>
-                    <p className="text-white font-bold">{user.username}</p>
+                <div className="flex items-center space-x-4 mb-3 p-3 bg-white/5 rounded-2xl">
+                  <img src={user.avatar} className="w-12 h-12 rounded-xl border-2 border-accent/30 shadow-lg object-cover" alt="avatar" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-bold truncate">{user.username}</p>
                     <p className="text-xs text-text-dim truncate">{user.email}</p>
                   </div>
                 </div>
+                
+                {realmInfo && (
+                  <div className="bg-white/5 p-4 rounded-xl mb-4 border border-white/5">
+                    <div className="flex justify-between items-center mb-2">
+                       <div className="flex items-center space-x-2">
+                         <FaStar className="text-accent" size={12} />
+                         <span className="text-xs font-black text-accent uppercase tracking-widest">{realmInfo.name}</span>
+                       </div>
+                       <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-bold">{realmInfo.isMax ? 'MAX' : `${realmInfo.currentExp}/${realmInfo.requiredExp} XP`}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-accent to-indigo-500 transition-all duration-500" style={{ width: `${realmInfo.progressPercent}%` }}></div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-2">
-                  <Link href="/profile" className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted"><FaUser className="mr-3 text-accent" /> Hồ sơ</Link>
-                  <Link href="/bookmarks" className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted"><FaBook className="mr-3 text-accent" /> Tủ truyện</Link>
+                  <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaUser className="mr-3 text-accent" /> Hồ sơ cá nhân</Link>
+                  <Link href="/bookmarks" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaBook className="mr-3 text-accent" /> Tủ truyện</Link>
                   <button onClick={logout} className="w-full flex items-center py-3 px-4 bg-red-400/5 text-red-400 rounded-xl text-sm font-bold"><FaSignOutAlt className="mr-3" /> Đăng xuất</button>
                 </div>
              </div>

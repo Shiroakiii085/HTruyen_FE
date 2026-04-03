@@ -4,15 +4,17 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { comicService } from '@/services/comicService';
 import { FaChevronLeft, FaHome, FaListUl, FaArrowUp, FaCog, FaExpand, FaCompress, FaSearch, FaChevronDown } from 'react-icons/fa';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Reader() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  
   const slug = params.slug as string;
   const chapterName = params.chapter as string;
   const apiUrl = searchParams.get('api');
+  const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
   
   const [images, setImages] = useState<any[]>([]);
   const [imageDomain, setImageDomain] = useState('');
@@ -107,6 +109,14 @@ export default function Reader() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleContainerTap = () => {
+    setShowControls(prev => !prev);
+  };
+
   const filteredChapters = chapterList.filter(c => 
     c.chapter_name.toLowerCase().includes(chapterSearch.toLowerCase())
   );
@@ -116,6 +126,19 @@ export default function Reader() {
       <div className="h-screen flex flex-col items-center justify-center bg-primary-bg space-y-6">
         <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
         <p className="text-text-dim font-black uppercase tracking-[0.3em] animate-pulse">Đang tải chương truyện...</p>
+      </div>
+    );
+  }
+
+  if (mounted && !user) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-primary-bg space-y-8 p-6 text-center">
+        <div className="glass p-10 rounded-3xl space-y-6 max-w-sm">
+           <h2 className="text-xl font-black text-white uppercase tracking-widest">YÊU CẦU ĐĂNG NHẬP</h2>
+           <p className="text-text-muted text-sm font-medium">Bạn cần đăng nhập để có thể đọc truyện và tích lũy Cảnh giới!</p>
+           <button onClick={() => router.push('/auth/login')} className="w-full bg-accent text-white py-4 rounded-2xl font-black hover:scale-105 transition-all shadow-xl shadow-accent/20">ĐĂNG NHẬP NGAY</button>
+           <button onClick={() => router.back()} className="w-full bg-white/5 text-text-muted py-3 rounded-2xl font-black hover:bg-white/10 transition-all">QUAY LẠI</button>
+        </div>
       </div>
     );
   }
@@ -239,18 +262,21 @@ export default function Reader() {
       </nav>
 
       {/* Reader (Image Thread) */}
-      <div className="max-w-3xl mx-auto flex flex-col items-center select-none pt-4">
+      <div 
+        className="max-w-3xl mx-auto flex flex-col items-center select-none pt-4 cursor-pointer"
+        onClick={handleContainerTap}
+      >
         {images.map((img, idx) => {
           let host = imageDomain;
           if (host && !host.startsWith('http')) host = `https://${host}`;
           const src = `${host}/${chapterPath}/${img.image_file}`;
           return (
-            <div key={idx} className="relative w-full group min-h-[400px] flex items-center justify-center bg-surface-bg/50">
+            <div key={idx} className="relative w-full max-w-[800px] mx-auto group min-h-[400px] flex items-center justify-center bg-surface-bg/50">
               <img 
                 src={src} 
                 alt={`Page ${img.image_page}`}
                 loading={idx < 3 ? "eager" : "lazy"}
-                className="w-full h-auto shadow-2xl transition-opacity duration-700"
+                className="w-full max-w-[800px] mx-auto h-auto shadow-2xl transition-opacity duration-700"
                 onLoad={(e) => (e.currentTarget.style.opacity = '1')}
                 style={{ opacity: 0 }}
               />
