@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
 
 export interface User {
   id: number;
@@ -19,6 +20,7 @@ interface AuthContextType {
   user: User | null;
   login: (token: string, userData: User) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -54,8 +56,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.push('/');
   };
 
+  const refreshUser = async () => {
+    try {
+      const res = await api.get('/Auth/me');
+      if (res.data) {
+        localStorage.setItem('user', JSON.stringify(res.data));
+        setUser(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to refresh user profile:', err);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

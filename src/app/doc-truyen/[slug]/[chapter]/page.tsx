@@ -14,7 +14,7 @@ export default function Reader() {
   const slug = params.slug as string;
   const chapterName = params.chapter as string;
   const apiUrl = searchParams.get('api');
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [mounted, setMounted] = useState(false);
   
   const [images, setImages] = useState<any[]>([]);
@@ -26,6 +26,7 @@ export default function Reader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [chapterList, setChapterList] = useState<any[]>([]);
   const [comicInfo, setComicInfo] = useState<any>(null);
+  const [loadedImagesCount, setLoadedImagesCount] = useState(0);
   const [isChapterMenuOpen, setIsChapterMenuOpen] = useState(false);
   const [chapterSearch, setChapterSearch] = useState('');
   const lastScrollY = useRef(0);
@@ -68,26 +69,39 @@ export default function Reader() {
     };
     fetchChapter();
     expRecorded.current = false;
+    setLoadedImagesCount(0); // Reset for new chapter
   }, [apiUrl]);
-
-  // Record reading history and grant EXP when chapter loads
+  
+  // Record reading history and grant EXP when chapter is fully loaded
   useEffect(() => {
-    if (!user || !slug || !chapterName || !apiUrl || expRecorded.current) return;
-    expRecorded.current = true;
+    if (!user || !slug || !chapterName || !apiUrl || expRecorded.current || images.length === 0) return;
+    
+    // Only call history API when all images in the chapter are loaded
+    if (loadedImagesCount >= images.length) {
+      expRecorded.current = true;
 
-    const domain = comicInfo?.APP_DOMAIN_CDN_IMAGE || 'https://img.otruyenapi.com';
-    const fullThumbUrl = comicInfo?.thumb_url ? 
-      (comicInfo.thumb_url.startsWith('http') ? comicInfo.thumb_url : `${domain}/uploads/comics/${comicInfo.thumb_url}`) : '';
+      const domain = comicInfo?.APP_DOMAIN_CDN_IMAGE || 'https://img.otruyenapi.com';
+      const fullThumbUrl = comicInfo?.thumb_url ? 
+        (comicInfo.thumb_url.startsWith('http') ? comicInfo.thumb_url : `${domain}/uploads/comics/${comicInfo.thumb_url}`) : '';
 
-    api.post('/History', {
-      comicSlug: slug,
-      comicName: comicInfo?.name || slug,
-      thumbUrl: fullThumbUrl,
-      chapterName: chapterName,
-      chapterApiData: apiUrl,
-      scrollPosition: 0
-    }).catch(err => console.error('History API error:', err));
-  }, [user, slug, chapterName, apiUrl, comicInfo]);
+      api.post('/History', {
+        comicSlug: slug,
+        comicName: comicInfo?.name || slug,
+        thumbUrl: fullThumbUrl,
+        chapterName: chapterName,
+        chapterApiData: apiUrl,
+        scrollPosition: 0
+      })
+      .then(res => {
+        if (res.data.expAdded > 0) {
+          // Success notification for gaining EXP
+          console.log(`Chúc mừng! Bạn đã nhận ${res.data.expAdded} EXP`);
+          refreshUser(); // Sync the UI level/exp bar
+        }
+      })
+      .catch(err => console.error('History API error:', err));
+    }
+  }, [user, slug, chapterName, apiUrl, comicInfo, images.length, loadedImagesCount]);
 
   const currentIndex = chapterList.findIndex(c => c.chapter_name === chapterName);
   
@@ -314,8 +328,10 @@ export default function Reader() {
                 alt={`Page ${img.image_page}`}
                 loading={idx < 3 ? "eager" : "lazy"}
                 className="w-full max-w-[800px] mx-auto h-auto shadow-2xl transition-opacity duration-700"
-                onLoad={(e) => (e.currentTarget.style.opacity = '1')}
-                style={{ opacity: 0 }}
+                onLoad={() => {
+                   setLoadedImagesCount(prev => prev + 1);
+                }}
+                style={{ opacity: 1 }}
               />
               <div className="absolute bottom-4 right-4 glass px-3 py-1 rounded-lg text-[10px] font-black text-text-dim opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 P. {img.image_page}
