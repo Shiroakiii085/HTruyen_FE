@@ -39,7 +39,7 @@ export default function Reader() {
         if (res.status === 'success') {
           const allChapters = res.data.item.chapters?.[0]?.server_data || [];
           setChapterList(allChapters);
-          setComicInfo(res.data.item);
+          setComicInfo({ ...res.data.item, APP_DOMAIN_CDN_IMAGE: res.data.APP_DOMAIN_CDN_IMAGE });
         }
       } catch (err) {
         console.error('Error fetching chapter list:', err);
@@ -75,10 +75,14 @@ export default function Reader() {
     if (!user || !slug || !chapterName || !apiUrl || expRecorded.current) return;
     expRecorded.current = true;
 
+    const domain = comicInfo?.APP_DOMAIN_CDN_IMAGE || 'https://img.otruyenapi.com';
+    const fullThumbUrl = comicInfo?.thumb_url ? 
+      (comicInfo.thumb_url.startsWith('http') ? comicInfo.thumb_url : `${domain}/uploads/comics/${comicInfo.thumb_url}`) : '';
+
     api.post('/History', {
       comicSlug: slug,
       comicName: comicInfo?.name || slug,
-      thumbUrl: comicInfo?.thumb_url || '',
+      thumbUrl: fullThumbUrl,
       chapterName: chapterName,
       chapterApiData: apiUrl,
       scrollPosition: 0

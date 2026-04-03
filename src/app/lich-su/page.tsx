@@ -57,6 +57,12 @@ export default function HistoryPage() {
     );
   }
 
+  const getFullThumbUrl = (url: string) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `https://img.otruyenapi.com/uploads/comics/${url}`;
+  };
+
   return (
     <div className="min-h-screen bg-primary-bg pb-20 pt-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
@@ -106,7 +112,7 @@ export default function HistoryPage() {
                 {/* Image Section */}
                 <div className="aspect-[3/4] relative overflow-hidden">
                   <img 
-                    src={item.thumbUrl} 
+                    src={getFullThumbUrl(item.thumbUrl)} 
                     alt={item.comicName}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
