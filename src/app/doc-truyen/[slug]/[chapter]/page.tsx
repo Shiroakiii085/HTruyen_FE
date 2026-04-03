@@ -188,14 +188,14 @@ export default function Reader() {
 
             {/* Central Navigation Group */}
             <div className="flex items-center gap-4 sm:gap-12">
-              {/* Left button = Prev chapter (lower number / older) */}
+              {/* Left button = Prev chapter (i-1) */}
               <button 
                 onClick={() => navigateToChapter(prevChapter)}
                 disabled={!prevChapter}
-                className={`p-3 sm:p-4 rounded-xl transition-all shadow-sm ${!prevChapter ? 'opacity-10 cursor-not-allowed text-text-dim bg-white/5' : 'text-text-dim hover:text-accent bg-white/10 hover:bg-white/15'}`}
+                className={`p-3 sm:p-4 rounded-xl transition-all shadow-sm ${!prevChapter ? 'opacity-10 cursor-not-allowed text-white/20 bg-white/5' : 'text-white/70 hover:text-white bg-white/10 hover:bg-white/15'}`}
                 title="Chương trước"
               >
-                <FaChevronLeft size={18} className="rotate-180" />
+                <FaChevronLeft size={18} />
               </button>
 
               <div className="relative" ref={menuRef}>
@@ -251,14 +251,14 @@ export default function Reader() {
                 )}
               </div>
 
-              {/* Right button = Next chapter (higher number / newer) */}
+              {/* Right button = Next chapter (i+1) */}
               <button 
                 onClick={() => navigateToChapter(nextChapter)}
                 disabled={!nextChapter}
-                className={`p-3 sm:p-4 rounded-xl transition-all shadow-sm ${!nextChapter ? 'opacity-10 cursor-not-allowed text-text-dim bg-white/5' : 'text-text-dim hover:text-accent bg-white/10 hover:bg-white/15'}`}
+                className={`p-3 sm:p-4 rounded-xl transition-all shadow-sm ${!nextChapter ? 'opacity-10 cursor-not-allowed text-white/20 bg-white/5' : 'text-white/70 hover:text-white bg-white/10 hover:bg-white/15'}`}
                 title="Chương sau"
               >
-                <FaChevronLeft size={18} />
+                <FaChevronLeft size={18} className="rotate-180" />
               </button>
             </div>
 
@@ -316,7 +316,7 @@ export default function Reader() {
               onClick={() => navigateToChapter(nextChapter)}
               className="flex-[2] bg-accent group hover:scale-[1.02] p-6 rounded-3xl transition-all border border-white/10 flex flex-col items-start gap-2 shadow-xl shadow-accent/20"
             >
-              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">← Chương tiếp theo</span>
+              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">← Chương sau (i+1)</span>
               <span className="text-white font-black">Chương {nextChapter.chapter_name}</span>
             </button>
           ) : (
@@ -331,7 +331,7 @@ export default function Reader() {
               onClick={() => navigateToChapter(prevChapter)}
               className="flex-1 glass group hover:bg-white/10 p-6 rounded-3xl transition-all border border-white/5 flex flex-col items-end gap-2"
             >
-              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">Chương trước →</span>
+              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">Chương trước (i-1) →</span>
               <span className="text-text-main font-black group-hover:text-accent transition-colors">Chương {prevChapter.chapter_name}</span>
             </button>
           )}
