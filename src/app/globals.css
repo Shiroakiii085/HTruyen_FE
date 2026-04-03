@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Premium Dark Palette */
+  --color-primary-bg: #030303;      /* Deep Black */
+  --color-surface-bg: #0d0d0d;      /* Onyx */
+  --color-surface-card: #141414;    /* Anthracite */
+  --color-accent: #6366f1;          /* Indigo Blue */
+  --color-accent-glow: rgba(99, 102, 241, 0.4);
+  --color-text-main: #f8fafc;       /* Slate White */
+  --color-text-muted: #94a3b8;      /* Slate Gray */
+  --color-text-dim: #475569;        /* Cool Gray */
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-glass-bg: rgba(13, 13, 13, 0.7);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--color-primary-bg);
+    color: var(--color-text-main);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .glass {
+    background: var(--color-glass-bg);
+    backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid var(--color-glass-border);
+  }
+  
+  .glass-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-border-subtle);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px var(--color-accent-glow);
+  }
+
+  .glass-bright {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  .shadow-premium {
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Custom Scrollbar for modern look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-primary-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-card);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
 }
