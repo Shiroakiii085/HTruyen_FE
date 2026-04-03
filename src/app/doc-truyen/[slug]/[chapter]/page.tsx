@@ -311,22 +311,12 @@ export default function Reader() {
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
         
         <div className="flex items-center gap-4 w-full">
-          {prevChapter && (
-            <button 
-              onClick={() => navigateToChapter(prevChapter)}
-              className="flex-1 glass group hover:bg-white/10 p-6 rounded-3xl transition-all border border-white/5 flex flex-col items-start gap-2"
-            >
-              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">← Chương trước</span>
-              <span className="text-text-main font-black group-hover:text-accent transition-colors">Chương {prevChapter.chapter_name}</span>
-            </button>
-          )}
-          
           {nextChapter ? (
             <button 
               onClick={() => navigateToChapter(nextChapter)}
-              className="flex-[2] bg-accent group hover:scale-[1.02] p-6 rounded-3xl transition-all border border-white/10 flex flex-col items-end gap-2 shadow-xl shadow-accent/20"
+              className="flex-[2] bg-accent group hover:scale-[1.02] p-6 rounded-3xl transition-all border border-white/10 flex flex-col items-start gap-2 shadow-xl shadow-accent/20"
             >
-              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">Chương tiếp theo →</span>
+              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">← Chương tiếp theo</span>
               <span className="text-white font-black">Chương {nextChapter.chapter_name}</span>
             </button>
           ) : (
@@ -334,6 +324,16 @@ export default function Reader() {
               <span className="text-[10px] font-black text-accent uppercase tracking-widest">Đã hết chương</span>
               <span className="text-text-dim font-bold text-xs">Hãy quay lại sau!</span>
             </div>
+          )}
+
+          {prevChapter && (
+            <button 
+              onClick={() => navigateToChapter(prevChapter)}
+              className="flex-1 glass group hover:bg-white/10 p-6 rounded-3xl transition-all border border-white/5 flex flex-col items-end gap-2"
+            >
+              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">Chương trước →</span>
+              <span className="text-text-main font-black group-hover:text-accent transition-colors">Chương {prevChapter.chapter_name}</span>
+            </button>
           )}
         </div>
       </div>
