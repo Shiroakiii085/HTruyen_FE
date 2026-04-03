@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getRealmInfo } from '@/utils/levelSystem';
-import { FaUser, FaCamera, FaStar, FaSave } from 'react-icons/fa';
+import { FaUser, FaCamera, FaStar, FaSave, FaShieldAlt, FaCrown } from 'react-icons/fa';
 
 export default function ProfilePage() {
   const { user, login } = useAuth();
@@ -69,6 +69,7 @@ export default function ProfilePage() {
   }
 
   const realmInfo = getRealmInfo(user.level || 1, user.exp || 0);
+  const isAdmin = user.role?.toLowerCase() === 'admin';
 
   return (
     <div className="min-h-screen bg-primary-bg pt-24 pb-12 px-4 flex flex-col items-center">
@@ -100,7 +101,17 @@ export default function ProfilePage() {
           </div>
 
           <h2 className="text-2xl font-black text-white mt-4 mb-1">{user.username}</h2>
-          <p className="text-sm font-medium text-text-dim mb-6">{user.email}</p>
+          <p className="text-sm font-medium text-text-dim mb-3">{user.email}</p>
+
+          {/* Role Badge */}
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5 text-xs font-black uppercase tracking-widest border ${
+            isAdmin 
+              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30 shadow-lg shadow-yellow-500/10' 
+              : 'bg-white/5 text-text-muted border-white/10'
+          }`}>
+            {isAdmin ? <FaCrown size={12} /> : <FaShieldAlt size={12} />}
+            <span>{isAdmin ? 'Quản trị viên' : 'Thành viên'}</span>
+          </div>
 
           {/* Realm Display Box */}
           <div className="w-full bg-white/5 rounded-2xl p-5 border border-white/10 shadow-inner">
