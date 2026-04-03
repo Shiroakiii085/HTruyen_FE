@@ -19,7 +19,20 @@ export default function Login() {
       login(res.data.token, res.data);
       router.push('/');
     } catch (err: any) {
-      setError(err.response?.data || 'Đăng nhập thất bại.');
+      let errorMsg = 'Đăng nhập thất bại.';
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errorMsg = err.response.data;
+        } else if (err.response.data.errors && typeof err.response.data.errors === 'object') {
+          const firstErr = Object.values(err.response.data.errors)[0] as string[];
+          errorMsg = (firstErr && firstErr.length > 0) ? firstErr[0] : err.response.data.title;
+        } else if (err.response.data.title) {
+          errorMsg = err.response.data.title;
+        } else if (err.response.data.message) {
+          errorMsg = err.response.data.message;
+        }
+      }
+      setError(errorMsg);
     }
   };
 
