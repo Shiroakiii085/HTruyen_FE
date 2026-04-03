@@ -9,16 +9,21 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+    setIsLoading(true);
+    setError('');
     try {
       const res = await api.post('/Auth/login', { email, password });
       login(res.data.token, res.data);
       router.push('/');
     } catch (err: any) {
+      setIsLoading(false);
       let errorMsg = 'Đăng nhập thất bại.';
       if (err.response?.data) {
         if (typeof err.response.data === 'string') {
@@ -44,7 +49,19 @@ export default function Login() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/30 blur-[120px] rounded-full"></div>
       </div>
 
-      <div className="relative z-10 max-w-md w-full p-10 md:p-12 glass rounded-[2.5rem] shadow-premium border border-white/5 backdrop-blur-2xl">
+      <div className="relative z-10 max-w-md w-full p-10 md:p-12 glass rounded-[2.5rem] shadow-premium border border-white/5 backdrop-blur-2xl overflow-hidden">
+        
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 z-50 bg-bg-main/80 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
+            <div className="w-12 h-12 border-4 border-accent/20 border-t-accent rounded-full animate-spin mb-4"></div>
+            <p className="text-accent font-black tracking-widest uppercase text-xs animate-pulse text-center px-6">
+              Hệ thống đang xử lý...<br/>
+              <span className="text-text-muted mt-2 block text-[10px]">Tài khoản đang được đăng nhập<br/>Vui lòng đợi!</span>
+            </p>
+          </div>
+        )}
+
         <div className="text-center mb-12">
           <Link href="/" className="inline-block text-3xl font-black bg-gradient-to-r from-accent to-indigo-400 bg-clip-text text-transparent mb-6">HTruyen</Link>
           <h2 className="text-3xl font-black text-text-main tracking-tight uppercase">Chào mừng trở lại</h2>
@@ -64,8 +81,9 @@ export default function Login() {
               type="email" 
               required
               value={email}
+              disabled={isLoading}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-text-main focus:ring-2 focus:ring-accent/50 focus:border-transparent outline-none transition-all placeholder:text-text-dim/50 text-sm font-medium shadow-inner"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-text-main focus:ring-2 focus:ring-accent/50 focus:border-transparent outline-none transition-all placeholder:text-text-dim/50 text-sm font-medium shadow-inner disabled:opacity-50"
               placeholder="name@example.com"
             />
           </div>
@@ -78,16 +96,18 @@ export default function Login() {
               type="password" 
               required
               value={password}
+              disabled={isLoading}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-text-main focus:ring-2 focus:ring-accent/50 focus:border-transparent outline-none transition-all placeholder:text-text-dim/50 text-sm font-medium shadow-inner"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-text-main focus:ring-2 focus:ring-accent/50 focus:border-transparent outline-none transition-all placeholder:text-text-dim/50 text-sm font-medium shadow-inner disabled:opacity-50"
               placeholder="••••••••"
             />
           </div>
           <button 
             type="submit" 
-            className="w-full flex justify-center py-5 px-4 rounded-2xl shadow-xl text-sm font-black text-white bg-accent hover:bg-indigo-500 shadow-accent/20 hover:shadow-accent/40 transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-[0.2em]"
+            disabled={isLoading}
+            className="w-full flex justify-center py-5 px-4 rounded-2xl shadow-xl text-sm font-black text-white bg-accent hover:bg-indigo-500 shadow-accent/20 hover:shadow-accent/40 transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-[0.2em] disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
           >
-            ĐĂNG NHẬP NGAY
+            {isLoading ? 'ĐANG TẢI...' : 'ĐĂNG NHẬP NGAY'}
           </button>
         </form>
 
