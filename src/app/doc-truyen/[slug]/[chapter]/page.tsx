@@ -213,10 +213,8 @@ export default function Reader() {
         <div className="mx-auto max-w-5xl mt-4 px-4">
           <div className="glass rounded-2xl px-4 py-3 flex justify-between items-center shadow-premium ring-1 ring-white/5 relative">
             <div className="flex items-center gap-2 flex-1">
-              <Link href="/" className="flex items-center group ml-1">
-                <span className="text-xl md:text-2xl font-black bg-gradient-to-r from-accent to-indigo-400 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-                  HTruyen
-                </span>
+              <Link href="/" className="flex items-center group ml-1 p-2 bg-white/5 hover:bg-accent/10 rounded-xl border border-white/5 hover:border-accent/30 transition-all duration-300" title="Về trang chủ">
+                <FaHome className="text-xl md:text-2xl text-accent group-hover:scale-110 transition-transform duration-300" />
               </Link>
             </div>
 

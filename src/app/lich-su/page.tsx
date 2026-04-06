@@ -110,11 +110,11 @@ export default function HistoryPage() {
                 className="group relative bg-surface-bg rounded-[2rem] overflow-hidden border border-white/5 hover:border-accent/30 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/5 hover:-translate-y-2 flex flex-col"
               >
                 {/* Image Section */}
-                <div className="aspect-[3/4] relative overflow-hidden">
+                <div className="aspect-[3/4] relative overflow-hidden bg-white/5">
                   <img 
                     src={getFullThumbUrl(item.thumbUrl)} 
                     alt={item.comicName}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-bg via-transparent to-transparent opacity-60"></div>
                   

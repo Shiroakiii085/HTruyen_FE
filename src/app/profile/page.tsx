@@ -3,7 +3,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getRealmInfo } from '@/utils/levelSystem';
-import { FaUser, FaCamera, FaStar, FaSave, FaShieldAlt, FaCrown } from 'react-icons/fa';
+import { FaUser, FaCamera, FaStar, FaSave, FaShieldAlt, FaCrown, FaChartLine, FaFire, FaHistory, FaCheckCircle } from 'react-icons/fa';
+import { adminService, MostReadStatistic } from '@/services/adminService';
 
 export default function ProfilePage() {
   const { user, login } = useAuth();
@@ -11,6 +12,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [adminStats, setAdminStats] = useState<MostReadStatistic[]>([]);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   useEffect(() => {
     // Basic auth check
@@ -21,6 +24,23 @@ export default function ProfilePage() {
       setLoading(false);
     }
   }, [user, router]);
+
+  useEffect(() => {
+    if (user?.role?.toLowerCase() === 'admin') {
+      const fetchStats = async () => {
+        try {
+          setStatsLoading(true);
+          const data = await adminService.getMostReadStatistics();
+          setAdminStats(data);
+        } catch (err) {
+          console.error("Failed to fetch admin stats:", err);
+        } finally {
+          setStatsLoading(false);
+        }
+      };
+      fetchStats();
+    }
+  }, [user]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -139,11 +159,74 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Admin Statistics Section */}
+        {isAdmin && (
+          <div className="glass rounded-[2rem] p-6 border border-white/5 shadow-2xl space-y-6">
+             <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                   <div className="p-2 bg-accent/20 rounded-xl">
+                      <FaChartLine className="text-accent" size={18} />
+                   </div>
+                   <h3 className="text-lg font-black text-white uppercase tracking-tighter">Thống kê hệ thống</h3>
+                </div>
+                <span className="text-[10px] font-black text-text-dim uppercase tracking-[0.2em] bg-white/5 px-3 py-1 rounded-full border border-white/5">TOP 10 TRUYỆN</span>
+             </div>
+
+             <div className="space-y-3">
+                {statsLoading ? (
+                  <div className="py-10 flex flex-col items-center justify-center gap-3">
+                     <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                     <span className="text-[10px] font-bold text-text-dim uppercase tracking-widest">Đang tính toán dữ liệu...</span>
+                  </div>
+                ) : adminStats.length > 0 ? (
+                  adminStats.map((stat, idx) => (
+                    <div key={stat.comicSlug} className="group relative flex items-center gap-4 p-3 bg-white/5 rounded-2xl border border-transparent hover:border-accent/30 hover:bg-white/10 transition-all duration-300">
+                       <div className="relative w-12 h-16 rounded-xl overflow-hidden shadow-lg">
+                          <img src={stat.thumbUrl} className="w-full h-full object-cover" alt={stat.comicName} />
+                          <div className="absolute top-0 left-0 w-5 h-5 bg-accent text-[10px] font-black text-white flex items-center justify-center rounded-br-lg">{idx + 1}</div>
+                       </div>
+                       
+                       <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-black text-white truncate group-hover:text-accent transition-colors uppercase tracking-tight">{stat.comicName}</h4>
+                          <div className="flex items-center gap-3 mt-1">
+                             <div className="flex items-center gap-1 text-[10px] font-bold text-text-dim capitalize">
+                                <FaFire size={10} className="text-orange-500" />
+                                <span>{stat.readCount} lượt đọc</span>
+                             </div>
+                             <div className="w-1 h-1 rounded-full bg-white/10"></div>
+                             <div className="text-[10px] font-medium text-text-muted truncate">
+                                {new Date(stat.lastReadAt).toLocaleDateString('vi-VN')}
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => router.push(`/truyen-tranh/${stat.comicSlug}`)}
+                            className="p-2 bg-accent/20 hover:bg-accent text-accent hover:text-white rounded-lg transition-all"
+                          >
+                             <FaHistory size={12} />
+                          </button>
+                       </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-8 text-center glass rounded-2xl border border-dashed border-white/10">
+                     <p className="text-text-dim text-xs font-bold uppercase tracking-widest">Chưa có dữ liệu thống kê</p>
+                  </div>
+                )}
+             </div>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex flex-col gap-3">
-          <button className="w-full glass py-4 rounded-2xl font-bold flex items-center justify-center space-x-3 text-text-muted hover:text-white hover:bg-white/10 transition-all border border-white/5">
-            <FaUser />
-            <span>Thống kê truyện đọc</span>
+          <button 
+            onClick={() => require('js-cookie').default.remove('token') || window.location.reload()}
+            className="w-full glass py-4 rounded-2xl font-bold flex items-center justify-center space-x-3 text-red-400/70 hover:text-red-400 hover:bg-red-400/5 transition-all border border-red-400/10"
+          >
+            <FaShieldAlt />
+            <span>ĐĂNG XUẤT TÀI KHOẢN</span>
           </button>
         </div>
 
