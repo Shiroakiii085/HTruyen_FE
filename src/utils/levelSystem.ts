@@ -1,19 +1,19 @@
 export const LEVEL_SYSTEM = [
-  { level: 1, name: "Đồng Bì Cảnh", requiredExp: 100 },
-  { level: 2, name: "Thảo Căn Cảnh", requiredExp: 300 },
-  { level: 3, name: "Liễu Cốt Cảnh", requiredExp: 1000 },
-  { level: 4, name: "Cốt Khí Cảnh", requiredExp: 2000 },
-  { level: 5, name: "Chúc Lô Cảnh", requiredExp: 3000 },
-  { level: 6, name: "Động Phủ Cảnh", requiredExp: 4000 },
-  { level: 7, name: "Quan Hải Cảnh", requiredExp: 5000 },
-  { level: 8, name: "Long Môn Cảnh", requiredExp: 6000 },
-  { level: 9, name: "Kim Đan Cảnh", requiredExp: 7000 },
-  { level: 10, name: "Nguyên Anh Cảnh", requiredExp: 8000 },
-  { level: 11, name: "Ngọc Phác Cảnh", requiredExp: 11000 },
-  { level: 12, name: "Tiên Nhân Cảnh", requiredExp: 12000 },
-  { level: 13, name: "Phi Thăng Cảnh", requiredExp: 13000 },
-  { level: 14, name: "Hợp Đạo Cảnh", requiredExp: 14000 },
-  { level: 15, name: "Chí Cao Viễn Cổ Thần Linh", requiredExp: 0 } // Max level
+  { level: 1, name: "Đồng Bì Cảnh", requiredExp: 100, icon: "/level_icon/1.png", color: "#B8860B", tier: 1 },
+  { level: 2, name: "Thảo Căn Cảnh", requiredExp: 300, icon: "/level_icon/2.png", color: "#32CD32", tier: 1 },
+  { level: 3, name: "Liễu Cốt Cảnh", requiredExp: 1000, icon: "/level_icon/3.png", color: "#00FF00", tier: 1 },
+  { level: 4, name: "Cốt Khí Cảnh", requiredExp: 2000, icon: "/level_icon/4.png", color: "#00FFFF", tier: 1 },
+  { level: 5, name: "Chúc Lô Cảnh", requiredExp: 3000, icon: "/level_icon/5.png", color: "#FF8C00", tier: 1 },
+  { level: 6, name: "Động Phủ Cảnh", requiredExp: 4000, icon: "/level_icon/6.png", color: "#008080", tier: 2 },
+  { level: 7, name: "Quan Hải Cảnh", requiredExp: 5000, icon: "/level_icon/7.png", color: "#1E90FF", tier: 2 },
+  { level: 8, name: "Long Môn Cảnh", requiredExp: 6000, icon: "/level_icon/8.png", color: "#4B0082", tier: 2 },
+  { level: 9, name: "Kim Đan Cảnh", requiredExp: 7000, icon: "/level_icon/9.png", color: "#FFD700", tier: 2 },
+  { level: 10, name: "Nguyên Anh Cảnh", requiredExp: 8000, icon: "/level_icon/10.png", color: "#87CEEB", tier: 2 },
+  { level: 11, name: "Ngọc Phác Cảnh", requiredExp: 11000, icon: "/level_icon/11.png", color: "#2E8B57", tier: 3 },
+  { level: 12, name: "Tiên Nhân Cảnh", requiredExp: 12000, icon: "/level_icon/12.png", color: "#DAA520", tier: 3 },
+  { level: 13, name: "Phi Thăng Cảnh", requiredExp: 13000, icon: "/level_icon/13.png", color: "#FFFACD", tier: 3 },
+  { level: 14, name: "Hợp Đạo Cảnh", requiredExp: 14000, icon: "/level_icon/14.png", color: "#800080", tier: 3 },
+  { level: 15, name: "Chí Cao Viễn Cổ Thần Linh", requiredExp: 0, icon: "/level_icon/15.png", color: "#FFFFFF", tier: 3 } // Max level
 ];
 
 const RANK_PREFIXES = [

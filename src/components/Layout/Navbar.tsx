@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { FaSearch, FaUser, FaSignOutAlt, FaBook, FaBars, FaTimes, FaStar, FaChartLine } from 'react-icons/fa';
-import { getRealmInfo } from '@/utils/levelSystem';
+import { animate } from 'animejs';
+import { getRealmInfo, LEVEL_SYSTEM } from '@/utils/levelSystem';
+import EvolvingProgressBar from '../Common/EvolvingProgressBar';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -14,6 +16,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const realmInfo = user ? getRealmInfo(user.level || 1, user.exp || 0) : null;
+  const currentRealm = realmInfo ? LEVEL_SYSTEM.find(r => r.level === realmInfo.level) : null;
 
   if (pathname?.startsWith('/doc-truyen/')) {
     return null;
@@ -26,14 +29,41 @@ export default function Navbar() {
     }
   };
 
+  const handleRipple = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const ripple = document.createElement('div');
+    ripple.className = 'absolute rounded-full bg-ink-deep/60 pointer-events-none mix-blend-multiply z-50';
+    ripple.style.width = '20px';
+    ripple.style.height = '20px';
+    ripple.style.left = `${x - 10}px`;
+    ripple.style.top = `${y - 10}px`;
+    
+    el.appendChild(ripple);
+
+    animate(ripple, {
+      scale: [0, 15],
+      opacity: [0.6, 0],
+      duration: 600,
+      easing: 'easeOutQuart'
+    }).then(() => {
+      ripple.remove();
+    });
+  };
+
   return (
-    <nav className="sticky top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-7xl glass rounded-2xl shadow-premium transition-all duration-300 translate-y-0">
-      <div className="px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-7xl bg-ink-deep/90 backdrop-blur-xl rounded-[4px] shadow-[0_4px_20px_rgba(26,20,16,0.7)] transition-all duration-300 translate-y-0 border border-gold-dim/40 overflow-hidden relative">
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper-2.png')] opacity-20 pointer-events-none mix-blend-multiply"></div>
+      <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white/5 to-transparent pointer-events-none opacity-30 mask-image-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxwYXRoIGQ9Ik0wLDEwMCBMMjAsODAgTDQwLDkwIEw2MCw1MCBMODAsNzAgTDEwMCw0MCBMMTAwLDEwMCBaIiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==')]"></div>
+      <div className="px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex justify-between items-center h-14 md:h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 flex items-center group">
-            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-accent to-indigo-400 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-              HTruyen
+            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-gold-ancient to-paper-warm bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(201,168,76,0.6)] group-hover:drop-shadow-[0_0_15px_rgba(201,168,76,1)] transition-all duration-300 font-[family-name:var(--font-heading)] tracking-wider">
+              Kiếm Lai
             </span>
           </Link>
 
@@ -43,7 +73,7 @@ export default function Navbar() {
               <Link 
                 key={idx}
                 href={idx === 0 ? '/' : idx === 3 ? '/the-loai' : `/danh-sach/truyen-${idx === 1 ? 'moi' : 'hot'}`} 
-                className="text-text-muted hover:text-accent font-semibold text-sm uppercase tracking-wide transition-all hover:translate-y-[-1px]"
+                className="relative text-paper-warm hover:text-gold-ancient font-semibold text-sm uppercase tracking-[0.15em] transition-colors py-1.5 font-[family-name:var(--font-heading)] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-gold-ancient after:origin-left after:[clip-path:inset(0_100%_0_0)] hover:after:[clip-path:inset(0_0_0_0)] after:transition-[clip-path] after:duration-500 after:ease-out"
               >
                 {item}
               </Link>
@@ -53,62 +83,91 @@ export default function Navbar() {
           {/* Search & Auth */}
           <div className="hidden md:flex items-center flex-1 justify-end space-x-6">
             <div className="relative group">
-              <input 
-                type="text" 
-                placeholder="Tìm truyện..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleSearch}
-                className="bg-white/5 text-text-main border border-white/10 rounded-xl py-2 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all w-48 group-focus-within:w-64 placeholder:text-text-dim text-sm"
-              />
-              <FaSearch className="absolute right-3 top-2.5 text-text-dim group-focus-within:text-accent transition-colors" size={14} />
+              <div className="relative group before:content-[''] before:absolute before:left-[-10px] before:top-[-4px] before:bottom-[-4px] before:w-[20px] before:bg-gold-dim before:rounded-full before:z-0 after:content-[''] after:absolute after:right-[-10px] after:top-[-4px] after:bottom-[-4px] after:w-[20px] after:bg-gold-dim after:rounded-full after:z-0">
+                <input 
+                  type="text" 
+                  placeholder="Tìm bí điển..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearch}
+                  className="relative z-10 bg-[#e8dbbf] text-ink-deep border-y-2 border-gold-ancient py-2 pl-4 pr-10 focus:outline-none focus:bg-paper-warm transition-all w-48 group-focus-within:w-64 placeholder:text-ink-deep/60 text-sm font-[family-name:var(--font-heading)] rounded-none shadow-[inset_0_2px_4px_rgba(26,20,16,0.3)]"
+                />
+                <FaSearch className="absolute right-2 top-3 z-20 text-ink-deep group-focus-within:text-blood-sect transition-colors cursor-pointer" size={14} />
+              </div>
             </div>
 
             {user ? (
               <div className="relative group">
-                <button className="flex items-center space-x-2 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-xl border border-white/10 transition-colors">
-                  <div className="w-7 h-7 rounded-lg overflow-hidden border border-accent/30 shadow-sm shadow-accent/20">
+                <button onClick={handleRipple} className="relative overflow-hidden flex items-center space-x-2 bg-paper-aged/10 hover:bg-gold-ancient/20 px-3 py-1.5 rounded-[4px] border border-gold-dim/30 transition-colors">
+                  <div className="w-7 h-7 rounded-[2px] overflow-hidden border border-gold-dim/50 shadow-sm">
                     <img src={user.avatar} className="w-full h-full object-cover" alt="avatar" />
                   </div>
-                  <span className="text-xs font-bold text-text-muted group-hover:text-text-main transition-colors">{user.username}</span>
+                  <span className="text-xs font-bold text-mist-gray group-hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">{user.username}</span>
                 </button>
                 
-                <div className="absolute right-0 top-full mt-2 w-52 glass rounded-2xl shadow-2xl py-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 border border-white/5 origin-top-right transform scale-95 group-hover:scale-100 backdrop-blur-2xl">
-                  <div className="px-4 py-2 border-b border-white/5 mb-1">
-                    <p className="text-xs text-text-dim font-medium uppercase tracking-tighter">Tài khoản</p>
-                    <p className="text-sm text-text-main font-bold truncate">{user.username}</p>
-                    {realmInfo && (
-                      <div className="mt-2">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-[10px] font-black text-accent uppercase tracking-widest">{realmInfo.name}</span>
-                          <span className="text-[10px] text-text-muted">{realmInfo.isMax ? 'MAX' : `${realmInfo.currentExp}/${realmInfo.requiredExp}`}</span>
+                <div className="absolute right-0 top-full mt-2 w-52 bg-ink-deep/95 rounded-[4px] shadow-md py-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 border border-gold-dim/30 origin-top-right transform scale-95 group-hover:scale-100 backdrop-blur-xl">
+                  <div className="px-4 py-3 border-b border-gold-dim/20 mb-1">
+                    <p className="text-[10px] text-mist-gray font-black uppercase tracking-[0.2em] font-[family-name:var(--font-heading)]">Thần Hồn</p>
+                    <p className="text-sm text-paper-warm font-bold truncate font-[family-name:var(--font-heading)]">{user.username}</p>
+                    
+                    {realmInfo && currentRealm && (
+                      <div className="mt-4 p-3 bg-white/5 rounded-2xl border border-white/5 group/realm relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover/realm:opacity-100 transition-opacity"></div>
+                        <div className="flex items-center space-x-3 mb-3 relative z-10">
+                          <div className="relative w-10 h-10 flex items-center justify-center">
+                            <div className="absolute inset-0 rounded-full blur-lg opacity-20" style={{ backgroundColor: currentRealm.color }}></div>
+                            <img 
+                              src={currentRealm.icon} 
+                              className="relative w-8 h-8 object-contain animate-float" 
+                              alt={currentRealm.name}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'https://cdn-icons-png.flaticon.com/512/10331/10331666.png'; // Fallback
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] font-black text-accent uppercase tracking-widest leading-none mb-1">Cảnh Giới</p>
+                            <p className="text-xs font-black text-text-main truncate">{currentRealm.name}</p>
+                          </div>
                         </div>
-                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full bg-accent transition-all duration-300" style={{ width: `${realmInfo.progressPercent}%` }}></div>
+                        
+                        <div className="space-y-1.5 relative z-10">
+                          <div className="flex justify-between items-center text-[10px] font-bold">
+                            <span className="text-text-dim uppercase tracking-tighter">Tiến độ</span>
+                            <span className="text-text-muted">{realmInfo.isMax ? 'MAX' : `${realmInfo.currentExp}/${realmInfo.requiredExp} XP`}</span>
+                          </div>
+                          <EvolvingProgressBar 
+                            level={currentRealm.level}
+                            progressPercent={realmInfo.progressPercent}
+                            tier={currentRealm.tier}
+                            color={currentRealm.color}
+                            isMax={realmInfo.isMax}
+                          />
                         </div>
                       </div>
                     )}
                   </div>
-                  <Link href="/profile" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
+                  <Link href="/profile" className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
                     <FaUser className="mr-3 opacity-70" /> Hồ sơ cá nhân
                   </Link>
-                  <Link href="/lich-su" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
-                    <FaBook className="mr-3 opacity-70" /> Truyện đã đọc
+                  <Link href="/lich-su" className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
+                    <FaBook className="mr-3 opacity-70" /> Ngọc Giản Tàng Thư
                   </Link>
                   {user.role?.toLowerCase() === 'admin' && (
-                    <Link href="/admin" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
-                      <FaChartLine className="mr-3 opacity-70" /> Quản trị hệ thống
+                    <Link href="/admin" className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
+                      <FaChartLine className="mr-3 opacity-70" /> Quản trị Thiên Các
                     </Link>
                   )}
-                  <div className="mx-2 my-1 border-t border-white/5"></div>
-                  <button onClick={logout} className="w-full flex items-center px-4 py-2.5 text-sm text-red-400/80 hover:text-red-400 hover:bg-red-400/5 transition-all">
-                    <FaSignOutAlt className="mr-3" /> Đăng xuất
+                  <div className="mx-2 my-1 border-t border-gold-dim/20"></div>
+                  <button onClick={logout} className="w-full flex items-center px-4 py-2.5 text-sm text-blood-sect hover:text-blood-sect/80 hover:bg-blood-sect/10 transition-all font-[family-name:var(--font-heading)]">
+                    <FaSignOutAlt className="mr-3" /> Xuất Các (Thoát)
                   </button>
                 </div>
               </div>
             ) : (
-              <Link href="/auth/login" className="bg-accent text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
-                Đăng nhập
+              <Link href="/auth/login" onClick={handleRipple} className="relative overflow-hidden bg-blood-sect text-paper-warm px-5 py-2.5 rounded-[4px] text-sm font-black border border-blood-sect/50 shadow-sm shadow-blood-sect/20 hover:shadow-blood-sect/40 hover:-translate-y-0.5 active:translate-y-0 transition-all font-[family-name:var(--font-heading)] tracking-widest uppercase">
+                Đăng Môn
               </Link>
             )}
           </div>
@@ -117,7 +176,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center">
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)} 
-              className={`p-2 rounded-xl transition-colors ${isMenuOpen ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-white/5'}`}
+              className={`p-2 rounded-[4px] transition-colors border border-transparent ${isMenuOpen ? 'bg-gold-ancient/10 text-gold-ancient border-gold-dim/30' : 'text-mist-gray hover:bg-gold-ancient/10 hover:text-gold-ancient hover:border-gold-dim/30'}`}
             >
               {isMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
             </button>
@@ -126,62 +185,74 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Nav */}
-      <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-[32rem] opacity-100 border-t border-white/5' : 'max-h-0 opacity-0'}`}>
-        <div className="px-4 py-6 space-y-5 bg-surface-bg/50 backdrop-blur-xl">
+      <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-[36rem] opacity-100 border-t border-gold-dim/30' : 'max-h-0 opacity-0'}`}>
+        <div className="px-4 py-6 space-y-5 bg-ink-deep/95 backdrop-blur-xl">
           <div className="relative">
             <input 
               type="text" 
-              placeholder="Tìm kiếm truyện..." 
+              placeholder="Tìm kiếm bí điển..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="w-full bg-white/5 text-white py-3 px-5 rounded-2xl border border-white/10 focus:ring-2 focus:ring-accent/50 outline-none placeholder:text-text-dim text-sm" 
+              className="w-full bg-paper-aged text-ink-black py-3 px-5 rounded-[4px] border border-gold-dim/30 focus:ring-2 focus:ring-blood-sect/50 outline-none placeholder:text-mist-gray text-sm font-[family-name:var(--font-heading)]" 
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             {['Trang chủ', 'Mới cập nhật', 'Truyện Hot', 'Thể loại'].map((item, idx) => (
-              <Link key={idx} href={idx === 0 ? '/' : idx === 3 ? '/the-loai' : `/danh-sach/truyen-${idx === 1 ? 'moi' : 'hot'}`} className="bg-white/5 py-3 px-4 rounded-xl text-sm font-medium text-text-muted hover:text-accent hover:bg-accent/5 text-center transition-all">
+              <Link key={idx} href={idx === 0 ? '/' : idx === 3 ? '/the-loai' : `/danh-sach/truyen-${idx === 1 ? 'moi' : 'hot'}`} className="bg-paper-aged/10 py-3 px-4 rounded-[4px] text-sm font-medium text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 border border-gold-dim/20 text-center transition-all font-[family-name:var(--font-heading)] tracking-widest uppercase">
                 {item}
               </Link>
             ))}
           </div>
           {user ? (
-             <div className="pt-4 border-t border-white/5">
-                <div className="flex items-center space-x-4 mb-3 p-3 bg-white/5 rounded-2xl">
-                  <img src={user.avatar} className="w-12 h-12 rounded-xl border-2 border-accent/30 shadow-lg object-cover" alt="avatar" />
+             <div className="pt-4 border-t border-gold-dim/20">
+                <div className="flex items-center space-x-4 mb-3 p-4 bg-paper-aged/10 border border-gold-dim/30 rounded-[4px]">
+                  <img src={user.avatar} className="w-12 h-12 rounded-[2px] border border-gold-ancient/40 shadow-sm object-cover" alt="avatar" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-bold truncate">{user.username}</p>
-                    <p className="text-xs text-text-dim truncate">{user.email}</p>
+                    <p className="text-paper-warm font-bold truncate font-[family-name:var(--font-heading)]">{user.username}</p>
+                    <p className="text-xs text-mist-gray truncate">{user.email}</p>
                   </div>
                 </div>
                 
-                {realmInfo && (
+                {realmInfo && currentRealm && (
                   <div className="bg-white/5 p-4 rounded-xl mb-4 border border-white/5">
                     <div className="flex justify-between items-center mb-2">
-                       <div className="flex items-center space-x-2">
-                         <FaStar className="text-accent" size={12} />
-                         <span className="text-xs font-black text-accent uppercase tracking-widest">{realmInfo.name}</span>
+                       <div className="flex items-center space-x-3">
+                          <img 
+                            src={currentRealm.icon} 
+                            className="w-8 h-8 object-contain animate-float" 
+                            alt="icon" 
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://cdn-icons-png.flaticon.com/512/10331/10331666.png'; // Fallback
+                            }}
+                          />
+                          <span className="text-xs font-black text-accent uppercase tracking-widest">{currentRealm.name}</span>
                        </div>
                        <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-bold">{realmInfo.isMax ? 'MAX' : `${realmInfo.currentExp}/${realmInfo.requiredExp} XP`}</span>
                     </div>
-                    <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-accent to-indigo-500 transition-all duration-500" style={{ width: `${realmInfo.progressPercent}%` }}></div>
-                    </div>
+                    <EvolvingProgressBar 
+                      level={currentRealm.level}
+                      progressPercent={realmInfo.progressPercent}
+                      tier={currentRealm.tier}
+                      color={currentRealm.color}
+                      isMax={realmInfo.isMax}
+                    />
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaUser className="mr-3 text-accent" /> Hồ sơ cá nhân</Link>
-                  <Link href="/lich-su" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaBook className="mr-3 text-accent" /> Truyện đã đọc</Link>
+                <div className="space-y-2 mt-4">
+                  <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaUser className="mr-3 text-gold-ancient" /> Hồ sơ cá nhân</Link>
+                  <Link href="/lich-su" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaBook className="mr-3 text-gold-ancient" /> Ngọc Giản Tàng Thư</Link>
                   {user.role?.toLowerCase() === 'admin' && (
-                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaChartLine className="mr-3 text-accent" /> Quản trị hệ thống</Link>
+                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaChartLine className="mr-3 text-gold-ancient" /> Quản trị Thiên Các</Link>
                   )}
-                  <button onClick={logout} className="w-full flex items-center py-3 px-4 bg-red-400/5 text-red-400 rounded-xl text-sm font-bold"><FaSignOutAlt className="mr-3" /> Đăng xuất</button>
+                  <button onClick={logout} className="w-full flex items-center py-4 px-4 bg-blood-sect/10 border border-blood-sect/30 text-blood-sect rounded-[4px] text-sm font-black font-[family-name:var(--font-heading)] uppercase tracking-widest hover:bg-blood-sect hover:text-paper-warm transition-all"><FaSignOutAlt className="mr-3" /> Xuất Các (Thoát)</button>
                 </div>
              </div>
           ) : (
-            <Link href="/auth/login" className="block w-full text-center bg-accent text-white py-4 rounded-2xl font-black shadow-xl shadow-accent/20">
-              BẮT ĐẦU ĐỌC NGAY
+            <Link href="/auth/login" className="block w-full text-center bg-blood-sect border border-blood-sect/50 text-paper-warm py-4 rounded-[4px] font-black shadow-sm font-[family-name:var(--font-heading)] tracking-widest uppercase hover:bg-blood-sect/80 transition-colors">
+              ĐĂNG MÔN NGAY
             </Link>
           )}
         </div>

@@ -2,10 +2,25 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { comicService } from '@/services/comicService';
-import { FaChevronLeft, FaHome, FaListUl, FaArrowUp, FaCog, FaExpand, FaCompress, FaSearch, FaChevronDown } from 'react-icons/fa';
+import { FaChevronLeft, FaHome, FaListUl, FaArrowUp, FaCog, FaExpand, FaCompress, FaSearch, FaChevronDown, FaMoon, FaSun } from 'react-icons/fa';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
+import CommentSection from '@/components/Comic/CommentSection';
+import AmbientDust from '@/components/Reader/AmbientDust';
+import ReadingContainer from '@/components/Reader/ReadingContainer';
+import ReaderSidebar from '@/components/Reader/ReaderSidebar';
+import ScrollChapterList from '@/components/Reader/ScrollChapterList';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const CULTIVATION_TERMS = [
+  'Thập Nhị Cảnh', 'Nguyên Anh', 'Kiếm Tiên', 'Luyện Khí', 'Trúc Cơ', 'Kim Đan', 
+  'Hóa Thần', 'Luyện Thần', 'Tiên Cảnh', 'Thánh Nhân', 'Kiếm Khí', 'Linh Khí', 
+  'Trảm Tiên', 'Phàm Nhân', 'Kiếm Khí Trường Hà', 'Phù Lục', 'Linh Trận'
+];
 
 export default function Reader() {
   const params = useParams();
@@ -29,8 +44,16 @@ export default function Reader() {
   const [loadedImagesCount, setLoadedImagesCount] = useState(0);
   const [isChapterMenuOpen, setIsChapterMenuOpen] = useState(false);
   const [chapterSearch, setChapterSearch] = useState('');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [theme, setTheme] = useState<'paper' | 'night' | 'bamboo'>('paper');
+  const [fontSize, setFontSize] = useState(20);
+  const [fontFamily, setFontFamily] = useState<'serif' | 'sans'>('serif');
+  const [isNovel, setIsNovel] = useState(false);
+  const [textContent, setTextContent] = useState<string>('');
+
   const lastScrollY = useRef(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const historySaved = useRef(false);
   const expRecorded = useRef(false);
 
   useEffect(() => {
@@ -56,9 +79,16 @@ export default function Reader() {
         setLoading(true);
         const res = await comicService.getChapter(apiUrl);
         if (res.status === 'success') {
-          setImages(res.data.item.chapter_image);
-          setImageDomain(res.data.domain_cdn || res.data.APP_DOMAIN_CDN_IMAGE);
-          setChapterPath(res.data.item.chapter_path);
+          const item = res.data.item;
+          if (item.chapter_image && item.chapter_image.length > 0) {
+            setImages(item.chapter_image);
+            setImageDomain(res.data.domain_cdn || res.data.APP_DOMAIN_CDN_IMAGE);
+            setChapterPath(item.chapter_path);
+            setIsNovel(false);
+          } else if (item.content) {
+            setTextContent(item.content);
+            setIsNovel(true);
+          }
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       } catch (err) {
@@ -68,83 +98,92 @@ export default function Reader() {
       }
     };
     fetchChapter();
+    historySaved.current = false;
     expRecorded.current = false;
-    setLoadedImagesCount(0); // Reset for new chapter
+    setLoadedImagesCount(0); 
   }, [apiUrl]);
   
-  // Record reading history and grant EXP when chapter is fully loaded
+  // 1. Record Reading History Immediately (Persistence/Navigation Fix)
   useEffect(() => {
-    if (!user || !slug || !chapterName || !apiUrl || expRecorded.current || images.length === 0) return;
+    if (!user || !slug || !chapterName || !apiUrl || historySaved.current || !comicInfo) return;
     
-    // Only call history API when all images in the chapter are loaded
+    historySaved.current = true;
+    const domain = comicInfo?.APP_DOMAIN_CDN_IMAGE || 'https://img.otruyenapi.com';
+    const fullThumbUrl = comicInfo?.thumb_url ? 
+      (comicInfo.thumb_url.startsWith('http') ? comicInfo.thumb_url : `${domain}/uploads/comics/${comicInfo.thumb_url}`) : '';
+
+    api.post('/History', {
+      comicSlug: slug,
+      comicName: comicInfo?.name || slug,
+      thumbUrl: fullThumbUrl,
+      chapterName: chapterName,
+      chapterApiData: apiUrl,
+      scrollPosition: 0
+    })
+    .catch(err => console.error('History API error:', err));
+  }, [user, slug, chapterName, apiUrl, comicInfo]);
+
+  // 2. Grant EXP Reward (Reward - remains tied to full load)
+  useEffect(() => {
+    if (!user || !slug || expRecorded.current || images.length === 0) return;
+    
     if (loadedImagesCount >= images.length) {
       expRecorded.current = true;
-
-      const domain = comicInfo?.APP_DOMAIN_CDN_IMAGE || 'https://img.otruyenapi.com';
-      const fullThumbUrl = comicInfo?.thumb_url ? 
-        (comicInfo.thumb_url.startsWith('http') ? comicInfo.thumb_url : `${domain}/uploads/comics/${comicInfo.thumb_url}`) : '';
-
       api.post('/History', {
         comicSlug: slug,
-        comicName: comicInfo?.name || slug,
-        thumbUrl: fullThumbUrl,
         chapterName: chapterName,
-        chapterApiData: apiUrl,
-        scrollPosition: 0
+        chapterApiData: apiUrl
       })
       .then(res => {
         if (res.data.expAdded > 0) {
-          // Success notification for gaining EXP
-          console.log(`Chúc mừng! Bạn đã nhận ${res.data.expAdded} EXP`);
-          refreshUser(); // Sync the UI level/exp bar
+          refreshUser();
         }
       })
-      .catch(err => console.error('History API error:', err));
+      .catch(err => console.error('Reward API error:', err));
     }
-  }, [user, slug, chapterName, apiUrl, comicInfo, images.length, loadedImagesCount]);
+  }, [user, images.length, loadedImagesCount, slug, chapterName, apiUrl, refreshUser]);
 
   const currentIndex = chapterList.findIndex(c => c.chapter_name === chapterName);
   
-  // Detect if the chapter list is ascending or descending based on first and last available chapters
-  const isAscending = chapterList.length > 1 && 
-    (parseFloat(chapterList[chapterList.length - 1].chapter_name) || 0) > (parseFloat(chapterList[0].chapter_name) || 0);
+  const goToNext = () => {
+    if (currentIndex > 0) {
+      setIsTransitioning(true);
+      const nextChapter = chapterList[currentIndex - 1];
+      setTimeout(() => {
+        router.push(`/doc-truyen/${slug}/${nextChapter.chapter_name}?api=${nextChapter.chapter_api_data}`);
+        setIsTransitioning(false);
+      }, 500);
+    }
+  };
 
-  // If ascending: next is i+1, prev is i-1. If descending: next is i-1, prev is i+1.
-  const nextChapter = isAscending 
-    ? (currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1] : null)
-    : (currentIndex > 0 ? chapterList[currentIndex - 1] : null);
-
-  const prevChapter = isAscending
-    ? (currentIndex > 0 ? chapterList[currentIndex - 1] : null)
-    : (currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1] : null);
-
-  const navigateToChapter = (chapter: any) => {
-    if (!chapter) return;
-    setIsChapterMenuOpen(false);
-    router.push(`/doc-truyen/${slug}/${chapter.chapter_name}?api=${encodeURIComponent(chapter.chapter_api_data)}`);
+  const goToPrev = () => {
+    if (currentIndex < chapterList.length - 1) {
+      setIsTransitioning(true);
+      const prevChapter = chapterList[currentIndex + 1];
+      setTimeout(() => {
+        router.push(`/doc-truyen/${slug}/${prevChapter.chapter_name}?api=${prevChapter.chapter_api_data}`);
+        setIsTransitioning(false);
+      }, 500);
+    }
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight;
-      const winHeight = window.innerHeight;
-      const scrollable = docHeight - winHeight;
-      const currentProgress = scrollable > 0 ? (currentScrollY / scrollable) * 100 : 0;
-      
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const currentProgress = (window.scrollY / totalHeight) * 100;
       setProgress(currentProgress);
-      setIsScrolled(currentScrollY > 500);
+      setIsScrolled(window.scrollY > 100);
 
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+      if (window.scrollY > lastScrollY.current + 10) {
         setShowControls(false);
         setIsChapterMenuOpen(false);
-      } else {
+      } else if (window.scrollY < lastScrollY.current - 10) {
         setShowControls(true);
       }
-      lastScrollY.current = currentScrollY;
+      lastScrollY.current = window.scrollY;
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -162,238 +201,179 @@ export default function Reader() {
     setMounted(true);
   }, []);
 
-  const handleContainerTap = () => {
-    setShowControls(prev => !prev);
+  const highlightTerms = (text: string) => {
+    let highlighted = text;
+    CULTIVATION_TERMS.forEach(term => {
+      const regex = new RegExp(`(${term})`, 'gi');
+      highlighted = highlighted.replace(regex, '<span class="cultivation-highlight">$1</span>');
+    });
+    return highlighted;
   };
 
-  const filteredChapters = chapterList.filter(c => 
-    c.chapter_name.toLowerCase().includes(chapterSearch.toLowerCase())
-  );
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center pt-40 space-y-4">
+           <div className="w-16 h-16 border-4 border-gold-ancient/10 border-t-gold-ancient rounded-full animate-spin"></div>
+           <p className="text-xs font-black text-gold-dim uppercase tracking-widest animate-pulse">Đang triệu hồi linh ảnh...</p>
+        </div>
+      );
+    }
 
-  if (loading) {
+    if (isNovel) {
+      return (
+        <div 
+          style={{ fontSize: `${fontSize}px` }} 
+          className={fontFamily === 'serif' ? 'font-serif' : 'font-sans'}
+        >
+          {textContent.split('\n').map((para, i) => {
+            const trimmed = para.trim();
+            if (!trimmed) return <br key={i} />;
+            
+            let content = trimmed;
+            const isDialogue = trimmed.startsWith('「') || trimmed.startsWith('“') || trimmed.startsWith('"') || trimmed.startsWith('-');
+            
+            return (
+              <p 
+                key={i} 
+                className={`mb-6 text-justify leading-relaxed ${isDialogue ? 'dialogue-line mb-8' : ''}`}
+                dangerouslySetInnerHTML={{ 
+                  __html: i === 0 ? `<span class="drop-cap">${content.charAt(0)}</span>${highlightTerms(content.slice(1))}` : highlightTerms(content)
+                }}
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-primary-bg space-y-6">
-        <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-text-dim font-black uppercase tracking-[0.3em] animate-pulse">Đang tải chương truyện...</p>
+      <div className="flex flex-col chapter-reveal-container gap-0">
+        {images.map((img, idx) => (
+          <img
+            key={idx}
+            src={`${imageDomain}/${chapterPath}/${img.image_file}`}
+            alt={`Trang ${idx + 1}`}
+            className="w-full h-auto object-contain select-none pointer-events-none opacity-0 translate-x-[20px] chapter-image-item"
+            loading={idx < 3 ? "eager" : "lazy"}
+            onLoad={(e) => {
+              setLoadedImagesCount(prev => prev + 1);
+              const target = e.target as HTMLImageElement;
+              gsap.to(target, {
+                translateX: 0,
+                opacity: 1,
+                duration: 0.6,
+                delay: (idx % 10) * 0.06,
+                ease: "power2.out"
+              });
+            }}
+          />
+        ))}
       </div>
     );
-  }
+  };
 
-  // Handle login requirement after mounting and ensuring auth rehydration is complete
-  if (mounted && !isLoading && !user) {
+  if (!mounted || isLoading || !user) {
     return (
-      <div className="min-h-screen bg-primary-bg flex items-center justify-center p-4">
-        <div className="glass p-10 rounded-3xl space-y-6 max-w-sm text-center">
-           <h2 className="text-xl font-black text-white uppercase tracking-widest">YÊU CẦU ĐĂNG NHẬP</h2>
-           <p className="text-text-muted text-sm font-medium">Bạn cần đăng nhập để có thể đọc truyện và tích lũy Cảnh giới!</p>
-           <button onClick={() => router.push('/auth/login')} className="w-full bg-accent text-white py-4 rounded-2xl font-black hover:scale-105 transition-all shadow-xl shadow-accent/20">ĐĂNG NHẬP NGAY</button>
-           <button onClick={() => router.back()} className="w-full bg-white/5 text-text-muted py-3 rounded-2xl font-black hover:bg-white/10 transition-all">QUAY LẠI</button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!images.length) {
-    return (
-      <div className="h-screen flex flex-col items-center justify-center bg-primary-bg space-y-8 p-6 text-center">
-        <div className="glass p-10 rounded-3xl space-y-6 max-w-sm">
-          <h2 className="text-xl font-black text-white uppercase tracking-widest">Không thể tải nội dung</h2>
-          <p className="text-text-muted text-sm font-medium">Chúng tôi gặp sự cố khi lấy hình ảnh cho chương này.</p>
-          <button onClick={() => router.back()} className="w-full bg-accent text-white py-4 rounded-2xl font-black hover:scale-105 transition-all">QUAY LẠI</button>
-        </div>
+      <div className="min-h-screen bg-paper-warm flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-gold-dim border-t-transparent rounded-full animate-spin opacity-50"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-primary-bg min-h-screen">
+    <div className={`min-h-screen relative transition-opacity duration-700 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+      {/* Absolute Top Progress - Sword Qi */}
+      <div className="fixed top-0 left-0 w-full h-[3px] bg-ink-deep/10 z-[100] pointer-events-none overflow-hidden">
+        <div 
+          className="h-full bg-gradient-to-r from-gold-ancient via-white to-gold-ancient shadow-[0_0_15px_rgba(201,168,76,0.8)] transition-transform duration-150 origin-left"
+          style={{ transform: `scaleX(${progress / 100})`, width: '100%' }}
+        ></div>
+      </div>
+
+      <AmbientDust />
       
-      {/* Dynamic Top Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${showControls ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
-        <div className="mx-auto max-w-5xl mt-4 px-4">
-          <div className="glass rounded-2xl px-4 py-3 flex justify-between items-center shadow-premium ring-1 ring-white/5 relative">
-            <div className="flex items-center gap-2 flex-1">
-              <Link href="/" className="flex items-center group ml-1 p-2 bg-white/5 hover:bg-accent/10 rounded-xl border border-white/5 hover:border-accent/30 transition-all duration-300" title="Về trang chủ">
-                <FaHome className="text-xl md:text-2xl text-accent group-hover:scale-110 transition-transform duration-300" />
-              </Link>
+      <ReaderSidebar 
+        fontSize={fontSize} setFontSize={setFontSize}
+        theme={theme} setTheme={setTheme}
+        fontFamily={fontFamily} setFontFamily={setFontFamily}
+      />
+
+      <ScrollChapterList 
+        isOpen={isChapterMenuOpen}
+        onClose={() => setIsChapterMenuOpen(false)}
+        chapters={chapterList}
+        currentChapter={chapterName}
+        slug={slug}
+        theme={theme}
+      />
+
+      {/* Top Simple Bar */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        showControls ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+      } px-6 pt-4`}>
+         <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <Link href={`/truyen-tranh/${slug}`} className="p-3 bg-white/5 backdrop-blur-md rounded-full border border-white/10 text-mist-gray hover:text-gold-ancient hover:bg-white/10 transition-all">
+               <FaChevronLeft />
+            </Link>
+            <div className="flex items-center gap-3">
+               <button 
+                 onClick={() => setIsChapterMenuOpen(true)}
+                 className="px-6 py-2 bg-ink-deep/80 backdrop-blur-md rounded-full border border-gold-dim/30 text-gold-ancient font-black text-xs font-[family-name:var(--font-heading)] uppercase tracking-[0.2em] hover:bg-ink-deep transition-all shadow-lg"
+               >
+                 Vạn Quyển Thư
+               </button>
             </div>
-
-            {/* Central Navigation Group */}
-            <div className="flex items-center gap-4 sm:gap-12">
-              {/* Left button = Prev chapter (i-1) */}
-              <button 
-                onClick={() => navigateToChapter(prevChapter)}
-                disabled={!prevChapter}
-                className={`p-3 sm:p-4 rounded-xl transition-all shadow-sm ${!prevChapter ? 'opacity-10 cursor-not-allowed text-white/20 bg-white/5' : 'text-white/70 hover:text-white bg-white/10 hover:bg-white/15'}`}
-                title="Chương trước"
-              >
-                <FaChevronLeft size={18} />
-              </button>
-
-              <div className="relative" ref={menuRef}>
-                <button 
-                  onClick={() => setIsChapterMenuOpen(!isChapterMenuOpen)}
-                  className="glass-bright px-4 sm:px-6 py-3 rounded-xl flex items-center gap-3 group hover:border-accent/40 transition-all border border-white/10"
-                >
-                  <div className="flex flex-col items-center">
-                    <span className="text-[9px] font-black text-accent uppercase tracking-[0.2em] leading-none mb-1">Chương</span>
-                    <span className="text-text-main font-black text-sm sm:text-base tracking-tighter leading-none">{chapterName}</span>
-                  </div>
-                  <FaChevronDown size={10} className={`text-text-dim group-hover:text-accent transition-transform duration-300 ${isChapterMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {/* Chapter Dropdown Menu */}
-                {isChapterMenuOpen && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 sm:w-80 glass rounded-3xl shadow-2xl border border-white/10 overflow-hidden animate-in fade-in zoom-in duration-200">
-                    <div className="p-4 bg-white/5 border-b border-white/5">
-                      <div className="relative">
-                        <input 
-                          type="text"
-                          placeholder="Tìm nhanh chương..."
-                          value={chapterSearch}
-                          onChange={(e) => setChapterSearch(e.target.value)}
-                          className="w-full bg-primary-bg/50 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
-                        />
-                        <FaSearch size={12} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-dim" />
-                      </div>
-                    </div>
-                    <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2">
-                       {filteredChapters.length > 0 ? (
-                         filteredChapters.map((chapter, idx) => (
-                           <button
-                             key={idx}
-                             onClick={() => navigateToChapter(chapter)}
-                             className={`w-full text-left px-4 py-3 rounded-xl transition-all flex justify-between items-center group ${chapter.chapter_name === chapterName ? 'bg-accent/20 border border-accent/20' : 'hover:bg-white/5 border border-transparent'}`}
-                           >
-                             <span className={`font-bold text-sm ${chapter.chapter_name === chapterName ? 'text-accent' : 'text-text-muted group-hover:text-text-main'}`}>
-                                Chương {chapter.chapter_name}
-                             </span>
-                             {chapter.chapter_name === chapterName && (
-                               <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>
-                             )}
-                           </button>
-                         ))
-                       ) : (
-                         <div className="py-10 text-center">
-                            <p className="text-text-dim text-xs font-bold uppercase tracking-widest">Không tìm thấy chương</p>
-                         </div>
-                       )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Right button = Next chapter (i+1) */}
-              <button 
-                onClick={() => navigateToChapter(nextChapter)}
-                disabled={!nextChapter}
-                className={`p-3 sm:p-4 rounded-xl transition-all shadow-sm ${!nextChapter ? 'opacity-10 cursor-not-allowed text-white/20 bg-white/5' : 'text-white/70 hover:text-white bg-white/10 hover:bg-white/15'}`}
-                title="Chương sau"
-              >
-                <FaChevronLeft size={18} className="rotate-180" />
-              </button>
-            </div>
-
-            <div className="flex-1 flex justify-end">
-              {/* Spacer or additional controls like settings/expand could go here */}
-            </div>
-          </div>
-        </div>
-        
-        {/* Progress bar */}
-        <div className="mx-auto max-w-5xl px-6 mt-2">
-          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-accent transition-all duration-300 ease-out shadow-[0_0_8px_rgba(239,68,68,0.5)]" 
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
+            <Link href="/" className="p-3 bg-white/5 backdrop-blur-md rounded-full border border-white/10 text-mist-gray hover:text-gold-ancient hover:bg-white/10 transition-all">
+               <FaHome />
+            </Link>
+         </div>
       </nav>
 
-      {/* Reader (Image Thread) */}
-      <div 
-        className="max-w-3xl mx-auto flex flex-col items-center select-none pt-4 cursor-pointer"
-        onClick={handleContainerTap}
+      <ReadingContainer 
+        title={comicInfo?.name || slug} 
+        chapterName={chapterName}
+        theme={theme}
       >
-        {images.map((img, idx) => {
-          let host = imageDomain;
-          if (host && !host.startsWith('http')) host = `https://${host}`;
-          const src = `${host}/${chapterPath}/${img.image_file}`;
-          return (
-            <div key={idx} className="relative w-full max-w-[800px] mx-auto group min-h-[400px] flex items-center justify-center bg-surface-bg/50">
-              <img 
-                src={src} 
-                alt={`Page ${img.image_page}`}
-                loading={idx < 3 ? "eager" : "lazy"}
-                className="w-full max-w-[800px] mx-auto h-auto shadow-2xl transition-opacity duration-700"
-                onLoad={() => {
-                   setLoadedImagesCount(prev => prev + 1);
-                }}
-                style={{ opacity: 1 }}
-              />
-              <div className="absolute bottom-4 right-4 glass px-3 py-1 rounded-lg text-[10px] font-black text-text-dim opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                P. {img.image_page}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+        {renderContent()}
+      </ReadingContainer>
 
-      {/* Bottom Navigation */}
-      <div className="max-w-3xl mx-auto px-4 py-20 flex flex-col items-center gap-8">
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-        
-        <div className="flex items-center gap-4 w-full">
-          {prevChapter ? (
-            <button 
-              onClick={() => navigateToChapter(prevChapter)}
-              className="flex-1 glass group hover:bg-white/10 p-6 rounded-3xl transition-all border border-white/5 flex flex-col items-start gap-2"
-            >
-              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">← Chương trước</span>
-              <span className="text-text-main font-black group-hover:text-accent transition-colors">Chương {prevChapter.chapter_name}</span>
-            </button>
-          ) : (
-             <div className="flex-1 glass p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center opacity-40">
-              <span className="text-[10px] font-black text-text-dim uppercase tracking-widest">Không có chương trước</span>
-            </div>
-          )}
-
-          {nextChapter ? (
-            <button 
-              onClick={() => navigateToChapter(nextChapter)}
-              className="flex-[2] bg-accent group hover:scale-[1.02] p-6 rounded-3xl transition-all border border-white/10 flex flex-col items-end gap-2 shadow-xl shadow-accent/20"
-            >
-              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">Chương sau →</span>
-              <span className="text-white font-black">Chương {nextChapter.chapter_name}</span>
-            </button>
-          ) : (
-            <div className="flex-1 glass p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] font-black text-accent uppercase tracking-widest">Đã hết chương</span>
-              <span className="text-text-dim font-bold text-xs">Hãy quay lại sau!</span>
-            </div>
-          )}
+      {/* Comment Section Extension */}
+      <div className={`py-20 transition-colors duration-700 ${theme === 'night' ? 'bg-ink-black' : theme === 'bamboo' ? 'bg-[#eef1ec]' : 'bg-paper-aged'}`}>
+        <div className="max-w-4xl mx-auto px-4">
+          <CommentSection comicSlug={slug} chapterName={chapterName} />
         </div>
       </div>
 
-      {/* Floating Action Buttons */}
-      <div className={`fixed right-8 flex flex-col gap-3 transition-all duration-500 z-[60] ${showControls ? 'bottom-20' : 'bottom-8'} ${isScrolled ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}>
-        <button 
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="p-5 rounded-2xl bg-accent text-white shadow-xl shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-1 transition-all group"
-        >
-          <FaArrowUp className="group-hover:scale-110 transition-transform" />
-        </button>
-      </div>
+      {/* Bottom Bronze Navigation */}
+      <div className={`fixed bottom-0 left-0 right-0 z-[60] transition-all duration-500 pb-8 flex justify-center ${
+        showControls ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
+      }`}>
+         <div className="flex items-center gap-6 p-1.5 bg-bronze-ancient/10 backdrop-blur-2xl rounded-full border-2 border-bronze-ancient/30 shadow-2xl overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+            
+            <button 
+              onClick={goToPrev}
+              disabled={currentIndex === chapterList.length - 1}
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-bronze-ancient to-gold-dim text-white shadow-xl hover:scale-105 active:scale-95 disabled:grayscale disabled:opacity-50 transition-all"
+            >
+              <FaChevronLeft className="text-xl" />
+            </button>
 
-      {/* Bottom Quick Info */}
-      <div className={`fixed bottom-0 left-0 right-0 p-4 transition-all duration-500 z-50 ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
-         <div className="mx-auto max-w-md glass px-6 py-2 rounded-full flex justify-between items-center text-[10px] font-black text-text-muted shadow-premium border border-white/5">
-            <span className="uppercase tracking-widest">Tiến độ đọc</span>
-            <span className="text-accent">{Math.round(progress)}%</span>
+            <div className="px-6 text-center">
+               <p className="text-[10px] font-black text-gold-ancient uppercase tracking-widest font-[family-name:var(--font-heading)]">Trang</p>
+               <p className="text-lg font-black text-white font-[family-name:var(--font-heading)]">{Math.round(progress)}%</p>
+            </div>
+
+            <button 
+              onClick={goToNext}
+              disabled={currentIndex === 0}
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-bronze-ancient to-gold-dim text-white shadow-xl hover:scale-105 active:scale-95 disabled:grayscale disabled:opacity-50 transition-all"
+            >
+              <FaChevronLeft className="text-xl rotate-180" />
+            </button>
          </div>
       </div>
-
     </div>
   );
 }

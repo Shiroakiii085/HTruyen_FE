@@ -1,24 +1,40 @@
 import api from '@/lib/api';
 
-const FORBIDDEN_SLUGS = ['dam-my', 'adult', 'soft-yuri', 'shoujo-ai', 'soft-yaoi', 'shounen-ai', 'smut', '16'];
+const FORBIDDEN_SLUGS = [
+  'dam-my', 'adult', 'soft-yuri', 'shoujo-ai', 'soft-yaoi', 'shounen-ai', 'smut', '16',
+  'shoujo', 'romance', 'ngon-tinh', 'ngôn-tình', 'gender-bender', 'shojo'
+];
+
+const FORBIDDEN_KEYWORDS = ['ngôn tình', 'đam mỹ', 'romance', 'shoujo', 'gender bender', 'yuri', 'yaoi'];
 
 const filterComics = (items: any[]) => {
   if (!items) return [];
   return items.filter(item => {
+    // Hide comics with no chapters
+    if (!item.chaptersLatest || item.chaptersLatest.length === 0) return false;
+
     // Check item.category or item.categories
     const categories = item.category || item.categories;
     if (!categories || !Array.isArray(categories)) return true;
     
-    return !categories.some((cat: any) => 
-      FORBIDDEN_SLUGS.includes(cat.slug) || 
-      FORBIDDEN_SLUGS.some(slug => cat.name?.toLowerCase().includes(slug))
-    );
+    return !categories.some((cat: any) => {
+      const slug = cat.slug?.toLowerCase() || '';
+      const name = cat.name?.toLowerCase() || '';
+      
+      return FORBIDDEN_SLUGS.includes(slug) || 
+             FORBIDDEN_KEYWORDS.some(kw => name.includes(kw) || slug.includes(kw));
+    });
   });
 };
 
 const filterCategories = (items: any[]) => {
   if (!items) return [];
-  return items.filter(cat => !FORBIDDEN_SLUGS.includes(cat.slug));
+  return items.filter(cat => {
+    const slug = cat.slug?.toLowerCase() || '';
+    const name = cat.name?.toLowerCase() || '';
+    return !FORBIDDEN_SLUGS.includes(slug) && 
+           !FORBIDDEN_KEYWORDS.some(kw => name.includes(kw) || slug.includes(kw));
+  });
 };
 
 export const comicService = {

@@ -1,0 +1,114 @@
+"use client";
+import React, { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import Link from 'next/link';
+import { FaTimes, FaSearch } from 'react-icons/fa';
+
+interface ScrollChapterListProps {
+  isOpen: boolean;
+  onClose: () => void;
+  chapters: any[];
+  currentChapter: string;
+  slug: string;
+  theme: 'paper' | 'night' | 'bamboo';
+}
+
+export default function ScrollChapterList({ isOpen, onClose, chapters, currentChapter, slug, theme }: ScrollChapterListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [search, setSearch] = React.useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      // "Unrolling" effect
+      gsap.to(scrollRef.current, {
+        height: '80vh',
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+      gsap.to(contentRef.current, {
+        opacity: 1,
+        scaleY: 1,
+        duration: 0.6,
+        delay: 0.2,
+        ease: 'power4.out'
+      });
+    } else {
+      gsap.to(contentRef.current, {
+        opacity: 0,
+        scaleY: 0.8,
+        duration: 0.4,
+        ease: 'power4.in'
+      });
+      gsap.to(scrollRef.current, {
+        height: 0,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.in'
+      });
+    }
+  }, [isOpen]);
+
+  const filteredChapters = chapters.filter(c => 
+    c.chapter_name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const themeClass = theme === 'paper' ? 'bg-paper-aged text-ink-black' : theme === 'night' ? 'bg-ink-black text-mist-gray' : 'bg-[#eef1ec] text-[#2d3e2f]';
+
+  return (
+    <div className={`fixed right-10 top-1/2 -translate-y-1/2 z-50 pointer-events-none transition-all ${isOpen ? 'pointer-events-auto' : ''}`}>
+      <div 
+        ref={scrollRef}
+        className={`w-80 h-0 opacity-0 overflow-hidden relative border-y-8 border-gold-ancient/40 rounded-t-lg rounded-b-lg shadow-[20px_0_50px_rgba(0,0,0,0.5)] ${themeClass}`}
+      >
+        {/* Scroll Cylinders (Top/Bottom) */}
+        <div className="absolute top-0 left-[-5%] right-[-5%] h-4 bg-gradient-to-b from-bronze-ancient to-gold-ancient/40 rounded-full z-20 shadow-sm border border-gold-ancient/30"></div>
+        <div className="absolute bottom-0 left-[-5%] right-[-5%] h-4 bg-gradient-to-t from-bronze-ancient to-gold-ancient/40 rounded-full z-20 shadow-sm border border-gold-ancient/30"></div>
+
+        {/* Scroll Content */}
+        <div ref={contentRef} className="h-full pt-6 pb-6 px-4 opacity-0 origin-top flex flex-col">
+           <div className="flex items-center justify-between p-4 border-b border-gold-ancient/20">
+              <h3 className="font-black font-[family-name:var(--font-heading)] uppercase tracking-widest text-xs">Vạn Quyền Thư</h3>
+              <button onClick={onClose} className="hover:text-blood-sect transition-colors">
+                 <FaTimes size={16} />
+              </button>
+           </div>
+           
+           <div className="p-4">
+              <div className="relative">
+                 <input 
+                   type="text" 
+                   placeholder="Tìm bí điển..."
+                   value={search}
+                   onChange={(e) => setSearch(e.target.value)}
+                   className="w-full bg-white/5 border border-gold-ancient/20 rounded-md py-2 px-8 text-xs focus:outline-none focus:border-gold-ancient transition-all"
+                 />
+                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-ancient/40" size={10} />
+              </div>
+           </div>
+
+           <div className="flex-1 overflow-y-auto custom-scrollbar px-2 space-y-1">
+              {filteredChapters.map((chapter, idx) => (
+                <Link
+                  key={idx}
+                  href={`/doc-truyen/${slug}/${chapter.chapter_name}?api=${chapter.chapter_api_data}`}
+                  className={`block px-4 py-3 rounded-lg text-sm transition-all border border-transparent ${
+                    chapter.chapter_name === currentChapter 
+                    ? 'bg-gold-ancient/20 border-gold-ancient/40 text-blood-sect font-bold shadow-inner' 
+                    : 'hover:bg-gold-ancient/10 hover:border-gold-ancient/10'
+                  }`}
+                  onClick={onClose}
+                >
+                  <div className="flex items-center justify-between">
+                     <span className="font-[family-name:var(--font-heading)]">Chương {chapter.chapter_name}</span>
+                     {chapter.chapter_name === currentChapter && <div className="w-1.5 h-1.5 bg-blood-sect rounded-full animate-pulse"></div>}
+                  </div>
+                </Link>
+              ))}
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+}

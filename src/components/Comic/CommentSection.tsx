@@ -3,13 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { commentService, Comment } from '@/services/commentService';
 import { getFullRankName } from '@/utils/levelSystem';
-import { FaCommentAlt, FaPaperPlane, FaShieldAlt, FaStar } from 'react-icons/fa';
+import { FaCommentAlt, FaPaperPlane, FaShieldAlt, FaStar, FaBookmark } from 'react-icons/fa';
 
 interface CommentSectionProps {
   comicSlug: string;
+  chapterName?: string; // If provided, only shows/posts for this chapter
 }
 
-export default function CommentSection({ comicSlug }: CommentSectionProps) {
+export default function CommentSection({ comicSlug, chapterName }: CommentSectionProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState('');
@@ -19,7 +20,8 @@ export default function CommentSection({ comicSlug }: CommentSectionProps) {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const data = await commentService.getComments(comicSlug);
+        setLoading(true);
+        const data = await commentService.getComments(comicSlug, chapterName);
         setComments(data);
       } catch (err) {
         console.error("Failed to fetch comments:", err);
@@ -28,7 +30,7 @@ export default function CommentSection({ comicSlug }: CommentSectionProps) {
       }
     };
     fetchComments();
-  }, [comicSlug]);
+  }, [comicSlug, chapterName]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +39,7 @@ export default function CommentSection({ comicSlug }: CommentSectionProps) {
 
     try {
       setSubmitting(true);
-      const newComment = await commentService.postComment(comicSlug, content);
+      const newComment = await commentService.postComment(comicSlug, content, chapterName);
       setComments([newComment, ...comments]);
       setContent('');
     } catch (err) {
@@ -49,11 +51,14 @@ export default function CommentSection({ comicSlug }: CommentSectionProps) {
 
   return (
     <div className="mt-16 space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-      <div className="flex items-center space-x-3">
-         <div className="w-1 h-8 bg-accent rounded-full shadow-lg shadow-accent/50"></div>
-         <h3 className="text-2xl font-black text-white uppercase tracking-tighter flex items-center">
-           <FaCommentAlt className="mr-3 text-accent" /> Bình luận ({comments.length})
-         </h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+           <div className="w-1 h-8 bg-accent rounded-full shadow-lg shadow-accent/50"></div>
+           <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter flex items-center">
+             <FaCommentAlt className="mr-3 text-accent" /> 
+             {chapterName ? `Bình luận Chương ${chapterName}` : "Thảo luận bộ truyện"} ({comments.length})
+           </h3>
+        </div>
       </div>
 
       {/* Input Section */}
@@ -67,7 +72,7 @@ export default function CommentSection({ comicSlug }: CommentSectionProps) {
                     <textarea 
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
-                      placeholder="Chia sẻ cảm nghĩ của bạn về bộ truyện này..."
+                      placeholder={chapterName ? `Bạn nghĩ gì về chương ${chapterName}?` : "Chia sẻ cảm nghĩ của bạn về bộ truyện này..."}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-text-main placeholder:text-text-dim focus:outline-none focus:border-accent/50 focus:bg-white/10 transition-all min-h-[100px] resize-none"
                     />
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-text-dim font-bold uppercase tracking-widest px-2">
@@ -117,7 +122,7 @@ export default function CommentSection({ comicSlug }: CommentSectionProps) {
            ))
          ) : comments.length > 0 ? (
            comments.map(comment => (
-             <div key={comment.id} className="group glass p-6 rounded-[2rem] border border-white/5 hover:border-white/10 transition-all hover:bg-white/5 flex items-start space-x-4 relative overflow-hidden">
+             <div key={comment.id} className="group glass p-6 rounded-[2rem] border border-white/5 hover:border-accent/20 transition-all hover:bg-white/5 flex items-start space-x-4 relative overflow-hidden">
                 <div className="relative shrink-0">
                    <img src={comment.user.avatar} className="w-12 h-12 rounded-2xl object-cover border border-white/10 shadow-lg" alt="user" />
                    {comment.user.role?.toLowerCase() === 'admin' && (
@@ -132,12 +137,24 @@ export default function CommentSection({ comicSlug }: CommentSectionProps) {
                       <span className={`text-sm font-black uppercase tracking-tight ${comment.user.role?.toLowerCase() === 'admin' ? 'text-yellow-400' : 'text-white'}`}>
                         {comment.user.username}
                       </span>
-                      <div className="flex items-center space-x-2 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20">
-                         <FaStar className="text-indigo-400" size={10} />
-                         <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">
+                      
+                      <div className="flex items-center space-x-2 bg-accent/10 px-2.5 py-1 rounded-lg border border-accent/20">
+                         <FaStar className="text-accent" size={10} />
+                         <span className="text-[10px] font-black text-accent uppercase tracking-widest">
                            {getFullRankName(comment.user.level)}
                          </span>
                       </div>
+
+                      {/* Chapter Badge for aggregated view */}
+                      {!chapterName && comment.chapterName && (
+                        <div className="flex items-center space-x-2 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10 group-hover:border-accent/30 group-hover:bg-accent/5 transition-all">
+                           <FaBookmark className="text-text-dim group-hover:text-accent" size={8} />
+                           <span className="text-[10px] font-black text-text-muted group-hover:text-text-main uppercase tracking-widest">
+                             Chương {comment.chapterName}
+                           </span>
+                        </div>
+                      )}
+
                       <span className="text-[10px] text-text-dim font-medium ml-auto hidden sm:block">
                          {new Date(comment.createdAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}
                       </span>
