@@ -5,9 +5,20 @@ const FORBIDDEN_SLUGS = ['dam-my', 'adult', 'soft-yuri', 'shoujo-ai', 'soft-yaoi
 const filterComics = (items: any[]) => {
   if (!items) return [];
   return items.filter(item => {
-    if (!item.category) return true;
-    return !item.category.some((cat: any) => FORBIDDEN_SLUGS.includes(cat.slug));
+    // Check item.category or item.categories
+    const categories = item.category || item.categories;
+    if (!categories || !Array.isArray(categories)) return true;
+    
+    return !categories.some((cat: any) => 
+      FORBIDDEN_SLUGS.includes(cat.slug) || 
+      FORBIDDEN_SLUGS.some(slug => cat.name?.toLowerCase().includes(slug))
+    );
   });
+};
+
+const filterCategories = (items: any[]) => {
+  if (!items) return [];
+  return items.filter(cat => !FORBIDDEN_SLUGS.includes(cat.slug));
 };
 
 export const comicService = {
@@ -27,6 +38,9 @@ export const comicService = {
   },
   getCategories: async () => {
     const res = await api.get('/proxy/the-loai');
+    if (res.data?.data?.items) {
+      res.data.data.items = filterCategories(res.data.data.items);
+    }
     return res.data;
   },
   getCategoryDetail: async (slug: string, page: number = 1) => {

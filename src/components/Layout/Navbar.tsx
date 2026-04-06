@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { FaSearch, FaUser, FaSignOutAlt, FaBook, FaBars, FaTimes, FaStar } from 'react-icons/fa';
+import { FaSearch, FaUser, FaSignOutAlt, FaBook, FaBars, FaTimes, FaStar, FaChartLine } from 'react-icons/fa';
 import { getRealmInfo } from '@/utils/levelSystem';
 
 export default function Navbar() {
@@ -95,6 +95,11 @@ export default function Navbar() {
                   <Link href="/lich-su" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
                     <FaBook className="mr-3 opacity-70" /> Truyện đã đọc
                   </Link>
+                  {user.role?.toLowerCase() === 'admin' && (
+                    <Link href="/admin" className="flex items-center px-4 py-2.5 hover:bg-white/5 text-sm text-text-muted hover:text-accent transition-colors">
+                      <FaChartLine className="mr-3 opacity-70" /> Quản trị hệ thống
+                    </Link>
+                  )}
                   <div className="mx-2 my-1 border-t border-white/5"></div>
                   <button onClick={logout} className="w-full flex items-center px-4 py-2.5 text-sm text-red-400/80 hover:text-red-400 hover:bg-red-400/5 transition-all">
                     <FaSignOutAlt className="mr-3" /> Đăng xuất
@@ -168,6 +173,9 @@ export default function Navbar() {
                 <div className="space-y-2">
                   <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaUser className="mr-3 text-accent" /> Hồ sơ cá nhân</Link>
                   <Link href="/lich-su" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaBook className="mr-3 text-accent" /> Truyện đã đọc</Link>
+                  {user.role?.toLowerCase() === 'admin' && (
+                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-3 px-4 bg-white/5 rounded-xl text-sm text-text-muted hover:text-white transition-colors"><FaChartLine className="mr-3 text-accent" /> Quản trị hệ thống</Link>
+                  )}
                   <button onClick={logout} className="w-full flex items-center py-3 px-4 bg-red-400/5 text-red-400 rounded-xl text-sm font-bold"><FaSignOutAlt className="mr-3" /> Đăng xuất</button>
                 </div>
              </div>
