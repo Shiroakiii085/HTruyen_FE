@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import anime from 'animejs/lib/anime.es.js';
+import { animate, stagger } from 'animejs';
 
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -18,11 +18,10 @@ export default function PageTransition({ children }: { children: React.ReactNode
     }
 
     // Identify stagger items (like novel cards) built-in anime-stagger-item class
-    anime({
-      targets: '.anime-stagger-item',
+    animate('.anime-stagger-item', {
       opacity: [0, 1],
       translateY: [20, 0],
-      delay: anime.stagger(150, { start: 500 }),
+      delay: stagger(150, { start: 500 }),
       easing: 'spring(1, 80, 10, 0)',
       duration: 1000,
     });
