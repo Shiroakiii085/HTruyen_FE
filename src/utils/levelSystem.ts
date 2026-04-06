@@ -16,14 +16,28 @@ export const LEVEL_SYSTEM = [
   { level: 15, name: "Chí Cao Viễn Cổ Thần Linh", requiredExp: 0 } // Max level
 ];
 
+const RANK_PREFIXES = [
+  "Nhất Cảnh", "Nhị Cảnh", "Tam Cảnh", "Tứ Cảnh", "Ngũ Cảnh",
+  "Lục Cảnh", "Thất Cảnh", "Bát Cảnh", "Cửu Cảnh", "Thập Cảnh",
+  "Thập Nhất Cảnh", "Thập Nhị Cảnh", "Thập Tam Cảnh", "Thập Tứ Cảnh", "Thập Ngũ Cảnh"
+];
+
+export const getFullRankName = (level: number) => {
+  const prefix = RANK_PREFIXES[level - 1] || RANK_PREFIXES[0];
+  const realm = LEVEL_SYSTEM.find(r => r.level == level) || LEVEL_SYSTEM[0];
+  return `${prefix}: ${realm.name}`;
+};
+
 export const getRealmInfo = (level: number, currentExp: number) => {
   const currentRealm = LEVEL_SYSTEM.find(r => r.level == level) || LEVEL_SYSTEM[0];
   const requiredExp = currentRealm.requiredExp;
+  const fullRankName = getFullRankName(level);
   
   if (level >= 15) {
     return {
       level,
       name: currentRealm.name,
+      fullRankName,
       currentExp: 0,
       requiredExp: 0,
       progressPercent: 100,
@@ -36,6 +50,7 @@ export const getRealmInfo = (level: number, currentExp: number) => {
   return {
     level,
     name: currentRealm.name,
+    fullRankName,
     currentExp,
     requiredExp,
     progressPercent,

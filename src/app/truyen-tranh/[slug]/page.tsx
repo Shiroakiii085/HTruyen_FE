@@ -5,6 +5,7 @@ import { comicService } from '@/services/comicService';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { FaHeart, FaPlay, FaList, FaShareAlt, FaSearch, FaUserCircle, FaCalendarAlt, FaStar } from 'react-icons/fa';
+import CommentSection from '@/components/Comic/CommentSection';
 
 export default function ComicDetail() {
   const params = useParams();
@@ -170,6 +171,9 @@ export default function ComicDetail() {
               )}
             </div>
           </section>
+
+          {/* Comment Section */}
+          <CommentSection comicSlug={slug} />
         </div>
 
         {/* Right Column: Metadata & Extra Info */}
