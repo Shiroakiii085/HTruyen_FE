@@ -379,7 +379,7 @@ export default function Reader() {
       </div>
 
       {/* Floating Action Buttons */}
-      <div className={`fixed bottom-8 right-8 flex flex-col gap-3 transition-all duration-500 ${isScrolled ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}>
+      <div className={`fixed right-8 flex flex-col gap-3 transition-all duration-500 z-[60] ${showControls ? 'bottom-20' : 'bottom-8'} ${isScrolled ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}>
         <button 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="p-5 rounded-2xl bg-accent text-white shadow-xl shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-1 transition-all group"
