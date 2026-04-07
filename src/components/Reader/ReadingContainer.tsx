@@ -29,7 +29,7 @@ export default function ReadingContainer({ children, title, chapterName, theme }
              </div>
              <div className="text-left">
                 <h2 className="text-jade-green font-black text-xs uppercase tracking-[0.3em] font-[family-name:var(--font-heading)]">HTruyen • Thư Các</h2>
-                <h1 className="text-4xl md:text-5xl font-black font-[family-name:var(--font-heading)] text-ink-black mt-1 drop-shadow-sm">
+                <h1 className="text-4xl md:text-5xl font-black font-[family-name:var(--font-heading)] text-text-main mt-1 drop-shadow-sm">
                   {title}
                 </h1>
              </div>
@@ -41,7 +41,7 @@ export default function ReadingContainer({ children, title, chapterName, theme }
           </div>
         </header>
 
-        <article className="relative z-10 text-lg md:text-xl leading-relaxed text-ink-black space-y-8 select-text">
+        <article className="relative z-10 text-lg md:text-xl leading-relaxed text-text-main space-y-8 select-text">
           {children}
         </article>
 

@@ -57,18 +57,18 @@ export default function Login() {
           <div className="absolute inset-0 z-50 bg-paper-aged/90 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
             <div className="w-16 h-16 border-4 border-gold-dim/20 border-t-blood-sect rounded-full animate-spin mb-6"></div>
             <p className="text-blood-sect font-black tracking-[0.2em] uppercase text-sm animate-pulse text-center px-6 font-[family-name:var(--font-heading)]">
-              Đang xác thực Thần Hồn...<br/>
-              <span className="text-mist-gray mt-2 block text-[10px] tracking-widest">Trận pháp đang mở ra môn hộ<br/>Xin đợi trong chốc lát!</span>
+              Đang xác nhận tài khoản...<br/>
+              <span className="text-mist-gray mt-2 block text-[10px] tracking-widest">Hệ thống đang kiểm tra thông tin<br/>Xin đợi trong chốc lát!</span>
             </p>
           </div>
         )}
 
         <div className="text-center mb-10">
-          <Link href="/" className="inline-block text-3xl font-black text-ink-black mb-4 font-[family-name:var(--font-heading)] drop-shadow-sm border-b border-gold-dim/30 pb-2">
+          <Link href="/" className="inline-block text-3xl font-black text-white mb-4 font-[family-name:var(--font-heading)] drop-shadow-sm border-b border-gold-dim/30 pb-2">
             HTruyen
           </Link>
-          <h2 className="text-3xl font-black text-ink-deep tracking-tight uppercase font-[family-name:var(--font-heading)]">Đăng Môn Ký</h2>
-          <p className="text-mist-gray mt-3 font-bold text-xs tracking-[0.2em] uppercase opacity-90 border-l border-gold-dim/40 pl-2 mx-auto w-fit">Xuất trình chân ngôn để tiến vào</p>
+          <h2 className="text-3xl font-black text-white tracking-tight uppercase font-[family-name:var(--font-heading)]">Đăng Nhập</h2>
+          <p className="text-mist-gray mt-3 font-bold text-xs tracking-[0.2em] uppercase opacity-90 border-l border-gold-dim/40 pl-2 mx-auto w-fit">Vui lòng nhập thông tin để tiếp tục</p>
         </div>
         
         {error && (
@@ -79,21 +79,21 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-8">
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-mist-gray uppercase tracking-[0.3em] ml-2">Thần Khí Truyền Âm (Email)</label>
+            <label className="block text-[10px] font-black text-mist-gray uppercase tracking-[0.3em] ml-2">Địa chỉ Email</label>
             <input 
               type="email" 
               required
               value={email}
               disabled={isLoading}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-paper-aged border border-gold-dim/30 rounded-[4px] px-6 py-4 text-ink-black focus:ring-2 focus:ring-blood-sect/40 focus:border-blood-sect/40 outline-none transition-all placeholder:text-mist-gray/50 text-sm font-medium shadow-inner disabled:opacity-50 font-[family-name:var(--font-heading)]"
-              placeholder="chan-nhan@kiemlai.com"
+              className="w-full bg-paper-aged border border-gold-dim/30 rounded-[4px] px-6 py-4 text-white focus:ring-2 focus:ring-blood-sect/40 focus:border-blood-sect/40 outline-none transition-all placeholder:text-mist-gray/50 text-sm font-medium shadow-inner disabled:opacity-50 font-[family-name:var(--font-heading)]"
+              placeholder="user@example.com"
             />
           </div>
           <div className="space-y-2">
             <div className="flex justify-between items-center px-2">
-              <label className="block text-[10px] font-black text-mist-gray uppercase tracking-[0.3em]">Chân Ngôn (Mật khẩu)</label>
-              <Link href="#" className="text-[10px] font-black text-blood-sect hover:text-gold-ancient uppercase tracking-widest transition-colors font-[family-name:var(--font-heading)]">Quên chân ngôn?</Link>
+              <label className="block text-[10px] font-black text-mist-gray uppercase tracking-[0.3em]">Mật khẩu</label>
+              <Link href="#" className="text-[10px] font-black text-blood-sect hover:text-gold-ancient uppercase tracking-widest transition-colors font-[family-name:var(--font-heading)]">Quên mật khẩu?</Link>
             </div>
             <input 
               type="password" 
@@ -101,7 +101,7 @@ export default function Login() {
               value={password}
               disabled={isLoading}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-paper-aged border border-gold-dim/30 rounded-[4px] px-6 py-4 text-ink-black focus:ring-2 focus:ring-blood-sect/40 focus:border-blood-sect/40 outline-none transition-all placeholder:text-mist-gray/50 text-sm font-medium shadow-inner disabled:opacity-50 font-[family-name:var(--font-heading)]"
+              className="w-full bg-paper-aged border border-gold-dim/30 rounded-[4px] px-6 py-4 text-white focus:ring-2 focus:ring-blood-sect/40 focus:border-blood-sect/40 outline-none transition-all placeholder:text-mist-gray/50 text-sm font-medium shadow-inner disabled:opacity-50 font-[family-name:var(--font-heading)]"
               placeholder="••••••••"
             />
           </div>
@@ -110,16 +110,16 @@ export default function Login() {
             disabled={isLoading}
             className="w-full flex justify-center py-5 px-4 rounded-[4px] shadow-md text-sm font-black text-paper-warm bg-blood-sect hover:bg-blood-sect/80 border border-blood-sect/50 transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-[0.3em] font-[family-name:var(--font-heading)] disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'ĐANG TỤ KHÍ...' : 'KHAI MỞ TRẬN PHÁP'}
+            {isLoading ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP'}
           </button>
         </form>
 
         <div className="mt-10 pt-8 border-t border-gold-dim/20 text-center relative">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-1 bg-gradient-to-r from-transparent via-gold-dim/40 to-transparent"></div>
           <p className="text-[11px] font-black text-mist-gray uppercase tracking-[0.1em] font-[family-name:var(--font-heading)]">
-            Chưa có đài danh?{' '}
+            Chưa có tài khoản?{' '}
             <Link href="/auth/register" className="text-blood-sect hover:text-gold-ancient transition-colors tracking-widest ml-1 border-b border-blood-sect/30 hover:border-gold-ancient/50 pb-0.5">
-              Tạo Thẻ Ngọc
+              Đăng ký ngay
             </Link>
           </p>
         </div>

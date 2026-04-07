@@ -16,6 +16,7 @@ interface ScrollChapterListProps {
 export default function ScrollChapterList({ isOpen, onClose, chapters, currentChapter, slug, theme }: ScrollChapterListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = React.useState('');
 
   useEffect(() => {
@@ -32,7 +33,10 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
         scaleY: 1,
         duration: 0.6,
         delay: 0.2,
-        ease: 'power4.out'
+        ease: 'power4.out',
+        onComplete: () => {
+          inputRef.current?.focus();
+        }
       });
     } else {
       gsap.to(contentRef.current, {
@@ -67,24 +71,25 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
         <div className="absolute bottom-0 left-[-5%] right-[-5%] h-4 bg-gradient-to-t from-bronze-ancient to-gold-ancient/40 rounded-full z-20 shadow-sm border border-gold-ancient/30"></div>
 
         {/* Scroll Content */}
-        <div ref={contentRef} className="h-full pt-6 pb-6 px-4 opacity-0 origin-top flex flex-col">
-           <div className="flex items-center justify-between p-4 border-b border-gold-ancient/20">
-              <h3 className="font-black font-[family-name:var(--font-heading)] uppercase tracking-widest text-xs">Vạn Quyền Thư</h3>
+        <div ref={contentRef} className="h-full pt-4 pb-4 px-3 opacity-0 origin-top flex flex-col">
+           <div className="flex items-center justify-between p-3 border-b border-gold-ancient/20">
+              <h3 className="font-black font-[family-name:var(--font-heading)] uppercase tracking-widest text-[10px]">Danh sách chương</h3>
               <button onClick={onClose} className="hover:text-blood-sect transition-colors">
                  <FaTimes size={16} />
               </button>
            </div>
            
-           <div className="p-4">
+           <div className="p-3">
               <div className="relative">
                  <input 
+                   ref={inputRef}
                    type="text" 
-                   placeholder="Tìm bí điển..."
+                   placeholder="Tìm chương..."
                    value={search}
                    onChange={(e) => setSearch(e.target.value)}
-                   className="w-full bg-white/5 border border-gold-ancient/20 rounded-md py-2 px-8 text-xs focus:outline-none focus:border-gold-ancient transition-all"
+                   className="w-full bg-white/10 border border-gold-ancient/30 rounded-md py-2.5 px-8 text-xs focus:outline-none focus:border-gold-ancient transition-all placeholder:text-mist-gray/50"
                  />
-                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-ancient/40" size={10} />
+                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-ancient/60" size={12} />
               </div>
            </div>
 

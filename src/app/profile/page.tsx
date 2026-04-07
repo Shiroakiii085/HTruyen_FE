@@ -67,7 +67,7 @@ export default function ProfilePage() {
   };
 
   if (loading || !user) {
-    return <div className="min-h-screen bg-primary-bg flex items-center justify-center text-white font-black italic uppercase tracking-widest animate-pulse">Đang cảm ứng thiên địa...</div>;
+    return <div className="min-h-screen bg-primary-bg flex items-center justify-center text-white font-black italic uppercase tracking-widest animate-pulse">Đang tải hồ sơ...</div>;
   }
 
   const realmInfo = getRealmInfo(user.level || 1, user.exp || 0);
@@ -113,7 +113,7 @@ export default function ProfilePage() {
               : 'bg-white/5 text-text-muted border-white/10'
           }`}>
             {isAdmin ? <FaCrown size={12} className="animate-pulse" /> : <FaShieldAlt size={12} />}
-            <span>{isAdmin ? 'Đạo Tổ (Admin)' : 'Đạo Hữu'}</span>
+            <span>{isAdmin ? 'Quản trị viên' : 'Thành viên'}</span>
           </div>
 
           {/* Realm Display Box - Tu Tien Aesthetic */}
@@ -136,18 +136,18 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-gold-ancient uppercase tracking-[0.2em] leading-none mb-1">Bảng Cảnh Giới</p>
-                      <p className="text-2xl font-black text-paper-warm font-[family-name:var(--font-heading)] group-hover/realm:text-gold-ancient transition-colors tracking-tight drop-shadow-md">{currentRealm.name}</p>
-                      <p className="text-[10px] font-bold text-mist-gray group-hover/realm:text-jade-light transition-colors mt-1 underline decoration-gold-dim/30 underline-offset-4">Tầng thứ {currentRealm.level}</p>
+                      <p className="text-[10px] font-black text-gold-ancient uppercase tracking-[0.2em] leading-none mb-1">Cấp độ tài khoản</p>
+                      <p className="text-2xl font-black text-white font-[family-name:var(--font-heading)] group-hover/realm:text-gold-ancient transition-colors tracking-tight drop-shadow-md">{currentRealm.name}</p>
+                      <p className="text-[10px] font-bold text-mist-gray group-hover/realm:text-jade-light transition-colors mt-1 underline decoration-gold-dim/30 underline-offset-4">Hạng {currentRealm.level}</p>
                     </div>
                   </div>
                </div>
                
                <div className="space-y-2 relative z-10">
                  <div className="flex justify-between items-end">
-                   <span className="text-[10px] font-black text-text-dim uppercase tracking-[0.2em]">Khí Hải Tiến Độ</span>
+                   <span className="text-[10px] font-black text-text-dim uppercase tracking-[0.2em]">Tiến độ thăng cấp</span>
                    <span className="text-xs font-black text-white italic">
-                      {realmInfo.isMax ? 'VÔ THƯỢNG' : `${realmInfo.currentExp.toLocaleString()} / ${realmInfo.requiredExp.toLocaleString()} XP`}
+                      {realmInfo.isMax ? 'TỐI ĐA' : `${realmInfo.currentExp.toLocaleString()} / ${realmInfo.requiredExp.toLocaleString()} XP`}
                    </span>
                  </div>
                  
@@ -160,7 +160,7 @@ export default function ProfilePage() {
                  />
                  
                  <p className="text-[10px] text-text-dim font-medium italic mt-3 text-center opacity-60">
-                    {realmInfo.isMax ? 'Ngài đã đạt tới đỉnh phong của võ đạo.' : `Cần thêm ${(realmInfo.requiredExp - realmInfo.currentExp).toLocaleString()} XP để đột phá.`}
+                    {realmInfo.isMax ? 'Bạn đã đạt tới cấp độ cao nhất.' : `Cần thêm ${(realmInfo.requiredExp - realmInfo.currentExp).toLocaleString()} XP để thăng hạng.`}
                  </p>
                </div>
             </div>

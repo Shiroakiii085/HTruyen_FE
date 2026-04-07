@@ -16,11 +16,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CULTIVATION_TERMS = [
-  'Thập Nhị Cảnh', 'Nguyên Anh', 'Kiếm Tiên', 'Luyện Khí', 'Trúc Cơ', 'Kim Đan', 
-  'Hóa Thần', 'Luyện Thần', 'Tiên Cảnh', 'Thánh Nhân', 'Kiếm Khí', 'Linh Khí', 
-  'Trảm Tiên', 'Phàm Nhân', 'Kiếm Khí Trường Hà', 'Phù Lục', 'Linh Trận'
-];
+const CULTIVATION_TERMS: string[] = [];
 
 export default function Reader() {
   const params = useParams();
@@ -62,7 +58,10 @@ export default function Reader() {
         const res = await comicService.getComicDetail(slug);
         if (res.status === 'success') {
           const allChapters = res.data.item.chapters?.[0]?.server_data || [];
-          setChapterList(allChapters);
+          // OTruyen API usually returns ascending [1, 2, 3]. 
+          // Our navigation logic assumes descending [3, 2, 1] (newest at index 0).
+          const sortedChapters = [...allChapters].reverse();
+          setChapterList(sortedChapters);
           setComicInfo({ ...res.data.item, APP_DOMAIN_CDN_IMAGE: res.data.APP_DOMAIN_CDN_IMAGE });
         }
       } catch (err) {
@@ -202,12 +201,8 @@ export default function Reader() {
   }, []);
 
   const highlightTerms = (text: string) => {
-    let highlighted = text;
-    CULTIVATION_TERMS.forEach(term => {
-      const regex = new RegExp(`(${term})`, 'gi');
-      highlighted = highlighted.replace(regex, '<span class="cultivation-highlight">$1</span>');
-    });
-    return highlighted;
+    // No highlighting needed for standard version
+    return text;
   };
 
   const renderContent = () => {
@@ -215,7 +210,7 @@ export default function Reader() {
       return (
         <div className="flex flex-col items-center justify-center pt-40 space-y-4">
            <div className="w-16 h-16 border-4 border-gold-ancient/10 border-t-gold-ancient rounded-full animate-spin"></div>
-           <p className="text-xs font-black text-gold-dim uppercase tracking-widest animate-pulse">Đang triệu hồi linh ảnh...</p>
+           <p className="text-xs font-black text-gold-dim uppercase tracking-widest animate-pulse">Đang tải nội dung...</p>
         </div>
       );
     }
@@ -321,7 +316,7 @@ export default function Reader() {
                  onClick={() => setIsChapterMenuOpen(true)}
                  className="px-6 py-2 bg-ink-deep/80 backdrop-blur-md rounded-full border border-gold-dim/30 text-gold-ancient font-black text-xs font-[family-name:var(--font-heading)] uppercase tracking-[0.2em] hover:bg-ink-deep transition-all shadow-lg"
                >
-                 Vạn Quyển Thư
+                 Danh sách chương
                </button>
             </div>
             <Link href="/" className="p-3 bg-white/5 backdrop-blur-md rounded-full border border-white/10 text-mist-gray hover:text-gold-ancient hover:bg-white/10 transition-all">
@@ -355,13 +350,13 @@ export default function Reader() {
             <button 
               onClick={goToPrev}
               disabled={currentIndex === chapterList.length - 1}
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-bronze-ancient to-gold-dim text-white shadow-xl hover:scale-105 active:scale-95 disabled:grayscale disabled:opacity-50 transition-all"
+              className="p-3 bg-white/10 rounded-full border border-white/20 text-white hover:gold-ancient hover:bg-white/20 transition-all disabled:opacity-20 translate-x-[-10px]"
             >
               <FaChevronLeft className="text-xl" />
             </button>
 
             <div className="px-6 text-center">
-               <p className="text-[10px] font-black text-gold-ancient uppercase tracking-widest font-[family-name:var(--font-heading)]">Trang</p>
+               <p className="text-[10px] font-black text-gold-ancient uppercase tracking-widest font-[family-name:var(--font-heading)]">Tiến độ</p>
                <p className="text-lg font-black text-white font-[family-name:var(--font-heading)]">{Math.round(progress)}%</p>
             </div>
 

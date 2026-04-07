@@ -77,17 +77,17 @@ export default function ComicDetail() {
           <div className="flex-1 flex flex-col justify-end space-y-6 text-center md:text-left">
             <div className="flex flex-wrap justify-center md:justify-start gap-3">
               <span className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-sm backdrop-blur-md shadow-sm font-[family-name:var(--font-heading)] ${comic.status === 'completed' ? 'bg-jade-green/10 text-jade-green border border-jade-green/30' : 'bg-blood-sect/10 text-blood-sect border border-blood-sect/30'}`}>
-                {comic.status === 'completed' ? 'Ngọc Giản Hoàn Thành' : 'Đang Cập Nhật'}
+                {comic.status === 'completed' ? 'Đã Hoàn Thành' : 'Đang Cập Nhật'}
               </span>
               {comic.category.slice(0, 4).map((cat: any) => (
-                <Link key={cat.id} href={`/the-loai/${cat.slug}`} className="px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-sm bg-paper-warm text-ink-deep border border-gold-dim/20 hover:bg-gold-ancient/20 hover:text-blood-sect hover:border-blood-sect/30 transition-all font-[family-name:var(--font-heading)] shadow-sm">
+                <Link key={cat.id} href={`/the-loai/${cat.slug}`} className="px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-sm bg-paper-warm text-white border border-gold-dim/20 hover:bg-gold-ancient/20 hover:text-blood-sect hover:border-blood-sect/30 transition-all font-[family-name:var(--font-heading)] shadow-sm">
                   {cat.name}
                 </Link>
               ))}
             </div>
             
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-black text-ink-black leading-tight drop-shadow-md font-[family-name:var(--font-heading)]">{comic.name}</h1>
+              <h1 className="text-4xl md:text-6xl font-black text-white leading-tight drop-shadow-md font-[family-name:var(--font-heading)]">{comic.name}</h1>
               <p className="text-mist-gray font-bold text-sm md:text-base tracking-widest uppercase opacity-80 border-l-2 border-gold-dim/30 pl-3">
                 {comic.origin_name?.join(' • ') || 'HTruyen Original'}
               </p>
@@ -99,16 +99,16 @@ export default function ComicDetail() {
                   href={`/doc-truyen/${slug}/${firstChapter.chapter_name}?api=${encodeURIComponent(firstChapter.chapter_api_data)}`} 
                   className="w-full sm:w-auto flex justify-center items-center gap-3 bg-blood-sect hover:bg-blood-sect/80 text-paper-warm px-10 py-5 rounded-md font-black transition-all hover:scale-105 shadow-[0_5px_15px_rgba(139,32,32,0.3)] tracking-widest font-[family-name:var(--font-heading)] border border-blood-sect/50"
                 >
-                  <FaPlay className="text-xs" /> KHAI TÔNG
+                  <FaPlay className="text-xs" /> ĐỌC NGAY
                 </Link>
               )}
               <button 
                 onClick={() => setIsBookmarked(!isBookmarked)}
-                className={`w-full sm:w-auto flex justify-center items-center gap-3 px-8 py-5 rounded-md font-black transition-all border shadow-sm font-[family-name:var(--font-heading)] tracking-widest ${isBookmarked ? 'bg-jade-green/10 border-jade-green/30 text-jade-green' : 'bg-paper-warm border-gold-dim/30 text-ink-deep hover:bg-gold-ancient/10'}`}
+                className={`w-full sm:w-auto flex justify-center items-center gap-3 px-8 py-5 rounded-md font-black transition-all border shadow-sm font-[family-name:var(--font-heading)] tracking-widest ${isBookmarked ? 'bg-jade-green/10 border-jade-green/30 text-jade-green' : 'bg-paper-warm border-gold-dim/30 text-white hover:bg-gold-ancient/10'}`}
               >
-                <FaHeart className={isBookmarked ? 'fill-current' : ''} /> {isBookmarked ? 'ĐÃ LƯU NGỌC GIẢN' : 'TÀNG THƯ'}
+                <FaHeart className={isBookmarked ? 'fill-current' : ''} /> {isBookmarked ? 'ĐÃ THEO DÕI' : 'THEO DÕI'}
               </button>
-              <button className="hidden sm:flex items-center justify-center w-14 h-14 rounded-md bg-paper-warm border border-gold-dim/30 text-ink-deep hover:text-blood-sect hover:bg-gold-ancient/10 transition-all shadow-sm">
+              <button className="hidden sm:flex items-center justify-center w-14 h-14 rounded-md bg-paper-warm border border-gold-dim/30 text-white hover:text-blood-sect hover:bg-gold-ancient/10 transition-all shadow-sm">
                 <FaShareAlt />
               </button>
             </div>
@@ -129,10 +129,10 @@ export default function ComicDetail() {
               <div className="w-8 h-8 rounded-full bg-gold-ancient/20 flex items-center justify-center border border-gold-dim/30">
                 <div className="w-2 h-2 bg-blood-sect rounded-full animate-pulse"></div>
               </div>
-              <h2 className="text-2xl font-black text-ink-black tracking-widest font-[family-name:var(--font-heading)]">Khảo Bản</h2>
+              <h2 className="text-2xl font-black text-white tracking-widest font-[family-name:var(--font-heading)]">Giới thiệu</h2>
             </div>
             <div 
-              className="text-ink-deep leading-relaxed text-base font-medium prose prose-invert opacity-90 first-letter:text-5xl first-letter:font-[family-name:var(--font-heading)] first-letter:text-blood-sect first-letter:mr-1 first-letter:float-left" 
+              className="text-text-main leading-relaxed text-base font-medium prose prose-invert opacity-90 first-letter:text-5xl first-letter:font-[family-name:var(--font-heading)] first-letter:text-blood-sect first-letter:mr-1 first-letter:float-left" 
               dangerouslySetInnerHTML={{ __html: comic.content }} 
             />
           </section>
@@ -144,10 +144,10 @@ export default function ComicDetail() {
                 <div className="w-8 h-8 rounded-full bg-heaven-blue/10 flex items-center justify-center border border-heaven-blue/30">
                   <FaList className="text-heaven-blue text-xs" />
                 </div>
-                <h2 className="text-2xl font-black text-ink-black tracking-widest flex items-center gap-3 font-[family-name:var(--font-heading)]">
-                  Mục Lục Truyện
+                <h2 className="text-2xl font-black text-white tracking-widest flex items-center gap-3 font-[family-name:var(--font-heading)]">
+                  Danh sách chương
                 </h2>
-                <span className="bg-paper-aged px-3 py-1 rounded-[4px] text-[10px] font-black text-ink-deep border border-gold-dim/20 shadow-inner">{chapters.length}</span>
+                <span className="bg-paper-aged px-3 py-1 rounded-[4px] text-[10px] font-black text-white border border-gold-dim/20 shadow-inner">{chapters.length}</span>
               </div>
               
               <div className="relative w-full sm:w-64">
@@ -156,7 +156,7 @@ export default function ComicDetail() {
                   placeholder="Tìm kiếm..." 
                   value={searchChapter}
                   onChange={(e) => setSearchChapter(e.target.value)}
-                  className="w-full bg-paper-aged border border-gold-dim/30 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blood-sect/30 text-ink-black placeholder:text-mist-gray font-[family-name:var(--font-heading)]"
+                  className="w-full bg-paper-aged border border-gold-dim/30 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blood-sect/30 text-white placeholder:text-mist-gray font-[family-name:var(--font-heading)]"
                 />
                 <FaSearch className="absolute left-3.5 top-3.5 text-mist-gray" size={12} />
               </div>
@@ -171,13 +171,13 @@ export default function ComicDetail() {
                 >
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold-ancient/0 group-hover:bg-blood-sect transition-colors"></div>
                   <div className="flex flex-col ml-2">
-                    <span className="font-black text-ink-deep group-hover:text-blood-sect transition-colors font-[family-name:var(--font-heading)] text-lg">Chương {chap.chapter_name}</span>
+                    <span className="font-black text-white group-hover:text-blood-sect transition-colors font-[family-name:var(--font-heading)] text-lg">Chương {chap.chapter_name}</span>
                     <span className="text-[9px] text-mist-gray font-bold uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity">Tiến vào</span>
                   </div>
                   <FaPlay className="text-gold-dim group-hover:text-blood-sect transition-colors scale-75" />
                 </Link>
               )) : (
-                <div className="col-span-full py-12 text-center text-mist-gray font-bold animate-pulse uppercase tracking-[0.2em] font-[family-name:var(--font-heading)] text-xl">Chưa có thông tin tầng lầu</div>
+                <div className="col-span-full py-12 text-center text-mist-gray font-bold animate-pulse uppercase tracking-[0.2em] font-[family-name:var(--font-heading)] text-xl">Chưa có chương nào</div>
               )}
             </div>
           </section>
@@ -190,7 +190,7 @@ export default function ComicDetail() {
         <div className="lg:col-span-4 space-y-8">
           <section className="bg-paper-warm/80 rounded-[2rem] p-8 border border-gold-dim/20 sticky top-28 shadow-sm relative overflow-hidden backdrop-blur-sm">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] bg-gold-ancient/5 rounded-bl-full pointer-events-none"></div>
-            <h3 className="text-xl font-black text-ink-black uppercase tracking-[0.2em] mb-8 border-b-2 border-gold-dim/10 pb-4 font-[family-name:var(--font-heading)]">Hồ Sơ Cổ Tịch</h3>
+            <h3 className="text-xl font-black text-white uppercase tracking-[0.2em] mb-8 border-b-2 border-gold-dim/10 pb-4 font-[family-name:var(--font-heading)]">Thông tin chi tiết</h3>
             
             <div className="space-y-8">
               <div className="flex items-start space-x-4 group">
@@ -198,8 +198,8 @@ export default function ComicDetail() {
                   <FaUserCircle className="text-gold-dim" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-mist-gray uppercase tracking-[0.2em] mb-1">Tu sĩ ghi chép</p>
-                  <p className="text-ink-black font-bold font-[family-name:var(--font-heading)] text-lg">{comic.author?.[0] || 'Vô Danh'}</p>
+                  <p className="text-[10px] font-black text-mist-gray uppercase tracking-[0.2em] mb-1">Tác giả</p>
+                  <p className="text-white font-bold font-[family-name:var(--font-heading)] text-lg">{comic.author?.[0] || 'Vô Danh'}</p>
                 </div>
               </div>
 
@@ -208,8 +208,8 @@ export default function ComicDetail() {
                    <FaCalendarAlt className="text-gold-dim" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-mist-gray uppercase tracking-[0.2em] mb-1">Tinh tượng cuối</p>
-                  <p className="text-ink-deep font-bold italic">{new Date(comic.updatedAt).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  <p className="text-[10px] font-black text-mist-gray uppercase tracking-[0.2em] mb-1">Ngày cập nhật</p>
+                  <p className="text-white font-bold italic">{new Date(comic.updatedAt).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
               </div>
 
@@ -218,15 +218,15 @@ export default function ComicDetail() {
                    <FaStar className="text-blood-sect" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-mist-gray uppercase tracking-[0.2em] mb-1">Cảnh Giới</p>
-                  <p className="text-ink-black font-bold uppercase tracking-widest font-[family-name:var(--font-heading)] text-lg">{comic.status === 'completed' ? 'Viên Mãn' : 'Đang Tụ Khí'}</p>
+                  <p className="text-[10px] font-black text-mist-gray uppercase tracking-[0.2em] mb-1">Trạng thái</p>
+                  <p className="text-white font-bold uppercase tracking-widest font-[family-name:var(--font-heading)] text-lg">{comic.status === 'completed' ? 'Hoàn Thành' : 'Đang tiến hành'}</p>
                 </div>
               </div>
             </div>
 
             <div className="mt-12 pt-8 border-t border-gold-dim/10">
                <button className="w-full bg-paper-aged hover:bg-blood-sect/10 text-blood-sect py-4 rounded-md font-black text-sm transition-all border border-blood-sect/30 font-[family-name:var(--font-heading)] tracking-widest uppercase">
-                 Báo Cáo Tà Ma (Lỗi)
+                 Báo lỗi truyện
                </button>
             </div>
           </section>

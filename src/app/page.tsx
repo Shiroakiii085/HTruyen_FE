@@ -104,13 +104,13 @@ export default function Home() {
                <FaFire className="text-blood-sect relative z-10" />
             </div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-black text-ink-black uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
+              <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
                 <XianxiaTransition type="ink-drop">Thịnh Hành</XianxiaTransition>
               </h2>
-              <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Danh Chấn Giang Hồ</p>
+              <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Truyện được đọc nhiều nhất</p>
             </div>
           </div>
-          <Link href="/truyen-hot" className="text-xs font-black text-gold-dim hover:text-blood-sect hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM DANH CÁC ›</Link>
+          <Link href="/truyen-hot" className="text-xs font-black text-gold-dim hover:text-blood-sect hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
         </div>
         <XianxiaTransition type="stagger-cards" delay={200}>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
@@ -131,13 +131,13 @@ export default function Home() {
                <FaBolt className="text-heaven-blue relative z-10" />
              </div>
              <div>
-               <h2 className="text-2xl md:text-3xl font-black text-ink-black uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
-                 <XianxiaTransition type="ink-drop" delay={400}>Mới Xuất Thế</XianxiaTransition>
+               <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
+                 <XianxiaTransition type="ink-drop" delay={400}>Mới Cập Nhật</XianxiaTransition>
                </h2>
-               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Thiên Cơ Cập Nhật</p>
+               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Vừa ra mắt gần đây</p>
              </div>
           </div>
-          <Link href="/danh-sach/truyen-moi" className="text-xs font-black text-gold-dim hover:text-heaven-blue hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM DANH CÁC ›</Link>
+          <Link href="/danh-sach/truyen-moi" className="text-xs font-black text-gold-dim hover:text-heaven-blue hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
         </div>
         <XianxiaTransition type="stagger-cards" delay={600}>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
@@ -158,11 +158,11 @@ export default function Home() {
                <FaBookOpen className="text-jade-green relative z-10" />
              </div>
              <div>
-               <h2 className="text-2xl md:text-3xl font-black text-ink-black uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">Đã Phi Thăng</h2>
-               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Trọn Bộ Cổ Tịch</p>
+               <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">Đã Hoàn Thành</h2>
+               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Danh sách trọn bộ</p>
              </div>
           </div>
-          <Link href="/danh-sach/hoan-thanh" className="text-xs font-black text-gold-dim hover:text-jade-green hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM DANH CÁC ›</Link>
+          <Link href="/danh-sach/hoan-thanh" className="text-xs font-black text-gold-dim hover:text-jade-green hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
           {fullComics.map((comic: ComicItem, index: number) => (

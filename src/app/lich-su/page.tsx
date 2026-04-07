@@ -76,7 +76,7 @@ export default function HistoryPage() {
             <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter">
               TRUYỆN ĐÃ <span className="text-accent underline decoration-accent/30 underline-offset-8">ĐỌC</span>
             </h1>
-            <p className="text-text-dim font-medium max-w-md">Lịch sử hành trình tu luyện và khám phá các thế giới của bạn.</p>
+            <p className="text-text-dim font-medium max-w-md">Lịch sử đọc truyện và hành trình khám phá thế giới của bạn.</p>
           </div>
           
           <div className="glass px-6 py-3 rounded-2xl border border-white/5 flex items-center gap-4">

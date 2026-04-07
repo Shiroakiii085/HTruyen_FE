@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2 space-y-6">
             <span className="text-4xl font-black bg-gradient-to-r from-jade-green to-heaven-blue bg-clip-text text-transparent font-[family-name:var(--font-heading)] drop-shadow-sm">HTruyen</span>
             <p className="text-slate-400 max-w-sm text-sm leading-relaxed font-medium">
-              Nền tảng đọc truyện tranh hiện đại, cập nhật nhanh nhất, trải nghiệm mượt mà nhất. Khám phá hàng ngàn siêu phẩm tu tiên, hành động và lãng mạn.
+              Nền tảng đọc truyện tranh hiện đại, cập nhật nhanh nhất, trải nghiệm mượt mà nhất. Khám phá hàng ngàn siêu phẩm hành động, lãng mạn và đa dạng thể loại hấp dẫn.
             </p>
           </div>
 

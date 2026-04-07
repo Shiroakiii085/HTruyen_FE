@@ -43,10 +43,10 @@ export default function GuidePopup() {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-accent">
               <FaGraduationCap size={20} />
-              <span className="text-xs font-black uppercase tracking-[0.3em]">Cẩm nang tu luyện</span>
+              <span className="text-xs font-black uppercase tracking-[0.3em]">Hướng dẫn thăng cấp</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase">
-              Hệ Thống <span className="text-accent underline decoration-accent/30 underline-offset-8">Cảnh Giới</span>
+              Hệ Thống <span className="text-accent underline decoration-accent/30 underline-offset-8">Danh Hiệu</span>
             </h2>
           </div>
           <button 
@@ -62,16 +62,16 @@ export default function GuidePopup() {
           <div className="space-y-4">
             <div className="grid grid-cols-12 gap-4 px-4 py-2 text-[10px] font-black text-text-dim uppercase tracking-widest border-b border-white/5">
               <div className="col-span-2">Cấp</div>
-              <div className="col-span-10">Thông Tin Cảnh Giới & Tiến Độ</div>
+              <div className="col-span-10">Thông Tin Cấp Bậc & Tiến Độ</div>
             </div>
 
             {LEVEL_SYSTEM.map((rank) => {
               const prefixes = [
-                "Nhất", "Nhị", "Tam", "Tứ", "Ngũ",
-                "Lục", "Thất", "Bát", "Cửu", "Thập",
-                "Thập Nhất", "Thập Nhị", "Thập Tam", "Thập Tứ", "Thập Ngũ"
+                "Cấp 1", "Cấp 2", "Cấp 3", "Cấp 4", "Cấp 5",
+                "Cấp 6", "Cấp 7", "Cấp 8", "Cấp 9", "Cấp 10",
+                "Cấp 11", "Cấp 12", "Cấp 13", "Cấp 14", "Cấp 15"
               ];
-              const prefix = prefixes[rank.level - 1] + " Cảnh";
+              const prefix = prefixes[rank.level - 1];
 
               return (
                 <div 
@@ -120,10 +120,10 @@ export default function GuidePopup() {
           <div className="mt-8 p-6 bg-accent/5 rounded-3xl border border-accent/10 flex gap-4 items-start shadow-inner shadow-accent/5">
              <FaInfoCircle className="text-accent mt-1 shrink-0" />
              <div className="space-y-1">
-                <p className="text-xs font-black text-white uppercase tracking-widest">Quy tắc tu luyện</p>
+                <p className="text-xs font-black text-white uppercase tracking-widest">Quy tắc thăng cấp</p>
                 <p className="text-xs text-text-dim leading-relaxed font-medium">
                   Bạn nhận được <span className="text-accent font-black">10 EXP</span> cho mỗi chương truyện đọc hoàn tất. 
-                  Sử dụng kinh nghiệm này để đột phá cảnh giới, từ <span className="text-accent/80 font-black">Phàm Nhân</span> đến <span className="text-white font-black italic underline decoration-accent/30 underline-offset-4 tracking-tighter">Chí Cao Thần Linh!</span>
+                  Dùng điểm kinh nghiệm này để thăng cấp danh hiệu, từ <span className="text-accent/80 font-black">Thành Viên Mới</span> đến <span className="text-white font-black italic underline decoration-accent/30 underline-offset-4 tracking-tighter">Bậc Thầy!</span>
                 </p>
              </div>
           </div>
@@ -141,7 +141,7 @@ export default function GuidePopup() {
             onClick={() => setIsOpen(false)}
             className="flex-[2] py-4 bg-accent text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-accent/20 hover:scale-[1.02] active:scale-95 transition-all"
           >
-            Bắt Đầu Tu Luyện!
+            Bắt đầu đọc!
           </button>
         </div>
       </div>

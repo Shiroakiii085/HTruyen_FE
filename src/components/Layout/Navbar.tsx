@@ -13,6 +13,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const realmInfo = user ? getRealmInfo(user.level || 1, user.exp || 0) : null;
@@ -86,7 +87,7 @@ export default function Navbar() {
               <div className="relative group before:content-[''] before:absolute before:left-[-10px] before:top-[-4px] before:bottom-[-4px] before:w-[20px] before:bg-gold-dim before:rounded-full before:z-0 after:content-[''] after:absolute after:right-[-10px] after:top-[-4px] after:bottom-[-4px] after:w-[20px] after:bg-gold-dim after:rounded-full after:z-0">
                 <input 
                   type="text" 
-                  placeholder="Tìm bí điển..." 
+                  placeholder="Tìm truyện..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearch}
@@ -97,17 +98,24 @@ export default function Navbar() {
             </div>
 
             {user ? (
-              <div className="relative group">
-                <button onClick={handleRipple} className="relative overflow-hidden flex items-center space-x-2 bg-paper-aged/10 hover:bg-gold-ancient/20 px-3 py-1.5 rounded-[4px] border border-gold-dim/30 transition-colors">
+              <div className="relative">
+                <button 
+                  onClick={(e) => { handleRipple(e); setIsUserMenuOpen(!isUserMenuOpen); }} 
+                  className={`relative overflow-hidden flex items-center space-x-2 px-3 py-1.5 rounded-[4px] border transition-colors ${isUserMenuOpen ? 'bg-gold-ancient/30 border-gold-ancient' : 'bg-paper-aged/10 hover:bg-gold-ancient/20 border-gold-dim/30'}`}
+                >
                   <div className="w-7 h-7 rounded-[2px] overflow-hidden border border-gold-dim/50 shadow-sm">
                     <img src={user.avatar} className="w-full h-full object-cover" alt="avatar" />
                   </div>
-                  <span className="text-xs font-bold text-mist-gray group-hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">{user.username}</span>
+                  <span className={`text-xs font-bold font-[family-name:var(--font-heading)] transition-colors ${isUserMenuOpen ? 'text-gold-ancient' : 'text-mist-gray'}`}>{user.username}</span>
                 </button>
                 
-                <div className="absolute right-0 top-full mt-2 w-52 bg-ink-deep/95 rounded-[4px] shadow-md py-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 border border-gold-dim/30 origin-top-right transform scale-95 group-hover:scale-100 backdrop-blur-xl">
+                <div 
+                  className={`absolute right-0 top-full mt-2 w-52 bg-ink-deep/95 rounded-[4px] shadow-md py-2 border border-gold-dim/30 origin-top-right transform transition-all duration-200 backdrop-blur-xl z-[100] ${
+                    isUserMenuOpen ? 'visible opacity-100 scale-100' : 'invisible opacity-0 scale-95'
+                  }`}
+                >
                   <div className="px-4 py-3 border-b border-gold-dim/20 mb-1">
-                    <p className="text-[10px] text-mist-gray font-black uppercase tracking-[0.2em] font-[family-name:var(--font-heading)]">Thần Hồn</p>
+                    <p className="text-[10px] text-mist-gray font-black uppercase tracking-[0.2em] font-[family-name:var(--font-heading)]">Tài khoản</p>
                     <p className="text-sm text-paper-warm font-bold truncate font-[family-name:var(--font-heading)]">{user.username}</p>
                     
                     {realmInfo && currentRealm && (
@@ -127,7 +135,7 @@ export default function Navbar() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-black text-accent uppercase tracking-widest leading-none mb-1">Cảnh Giới</p>
+                            <p className="text-[10px] font-black text-accent uppercase tracking-widest leading-none mb-1">Cấp độ</p>
                             <p className="text-xs font-black text-text-main truncate">{currentRealm.name}</p>
                           </div>
                         </div>
@@ -148,26 +156,26 @@ export default function Navbar() {
                       </div>
                     )}
                   </div>
-                  <Link href="/profile" className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
+                  <Link href="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
                     <FaUser className="mr-3 opacity-70" /> Hồ sơ cá nhân
                   </Link>
-                  <Link href="/lich-su" className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
-                    <FaBook className="mr-3 opacity-70" /> Ngọc Giản Tàng Thư
+                  <Link href="/lich-su" onClick={() => setIsUserMenuOpen(false)} className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
+                    <FaBook className="mr-3 opacity-70" /> Truyện đã đọc
                   </Link>
                   {user.role?.toLowerCase() === 'admin' && (
-                    <Link href="/admin" className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
-                      <FaChartLine className="mr-3 opacity-70" /> Quản trị Thiên Các
+                    <Link href="/admin" onClick={() => setIsUserMenuOpen(false)} className="flex items-center px-4 py-2.5 hover:bg-gold-ancient/20 text-sm text-mist-gray hover:text-gold-ancient transition-colors font-[family-name:var(--font-heading)]">
+                      <FaChartLine className="mr-3 opacity-70" /> Trang quản trị
                     </Link>
                   )}
                   <div className="mx-2 my-1 border-t border-gold-dim/20"></div>
-                  <button onClick={logout} className="w-full flex items-center px-4 py-2.5 text-sm text-blood-sect hover:text-blood-sect/80 hover:bg-blood-sect/10 transition-all font-[family-name:var(--font-heading)]">
-                    <FaSignOutAlt className="mr-3" /> Xuất Các (Thoát)
+                  <button onClick={() => { logout(); setIsUserMenuOpen(false); }} className="w-full flex items-center px-4 py-2.5 text-sm text-blood-sect hover:text-blood-sect/80 hover:bg-blood-sect/10 transition-all font-[family-name:var(--font-heading)]">
+                    <FaSignOutAlt className="mr-3" /> Đăng xuất (Thoát)
                   </button>
                 </div>
               </div>
             ) : (
               <Link href="/auth/login" onClick={handleRipple} className="relative overflow-hidden bg-blood-sect text-paper-warm px-5 py-2.5 rounded-[4px] text-sm font-black border border-blood-sect/50 shadow-sm shadow-blood-sect/20 hover:shadow-blood-sect/40 hover:-translate-y-0.5 active:translate-y-0 transition-all font-[family-name:var(--font-heading)] tracking-widest uppercase">
-                Đăng Môn
+                Đăng nhập
               </Link>
             )}
           </div>
@@ -190,11 +198,11 @@ export default function Navbar() {
           <div className="relative">
             <input 
               type="text" 
-              placeholder="Tìm kiếm bí điển..." 
+              placeholder="Tìm kiếm truyện..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="w-full bg-paper-aged text-ink-black py-3 px-5 rounded-[4px] border border-gold-dim/30 focus:ring-2 focus:ring-blood-sect/50 outline-none placeholder:text-mist-gray text-sm font-[family-name:var(--font-heading)]" 
+              className="w-full bg-paper-aged text-white py-3 px-5 rounded-[4px] border border-gold-dim/30 focus:ring-2 focus:ring-blood-sect/50 outline-none placeholder:text-mist-gray text-sm font-[family-name:var(--font-heading)]" 
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -243,16 +251,16 @@ export default function Navbar() {
 
                 <div className="space-y-2 mt-4">
                   <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaUser className="mr-3 text-gold-ancient" /> Hồ sơ cá nhân</Link>
-                  <Link href="/lich-su" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaBook className="mr-3 text-gold-ancient" /> Ngọc Giản Tàng Thư</Link>
+                  <Link href="/lich-su" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaBook className="mr-3 text-gold-ancient" /> Truyện đã đọc</Link>
                   {user.role?.toLowerCase() === 'admin' && (
-                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaChartLine className="mr-3 text-gold-ancient" /> Quản trị Thiên Các</Link>
+                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="flex items-center w-full py-4 px-4 bg-paper-aged/10 border border-gold-dim/20 rounded-[4px] text-sm text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 transition-colors font-[family-name:var(--font-heading)] uppercase tracking-wider"><FaChartLine className="mr-3 text-gold-ancient" /> Trang quản trị</Link>
                   )}
-                  <button onClick={logout} className="w-full flex items-center py-4 px-4 bg-blood-sect/10 border border-blood-sect/30 text-blood-sect rounded-[4px] text-sm font-black font-[family-name:var(--font-heading)] uppercase tracking-widest hover:bg-blood-sect hover:text-paper-warm transition-all"><FaSignOutAlt className="mr-3" /> Xuất Các (Thoát)</button>
+                  <button onClick={() => { logout(); setIsMenuOpen(false); }} className="w-full flex items-center py-4 px-4 bg-blood-sect/10 border border-blood-sect/30 text-blood-sect rounded-[4px] text-sm font-black font-[family-name:var(--font-heading)] uppercase tracking-widest hover:bg-blood-sect hover:text-paper-warm transition-all"><FaSignOutAlt className="mr-3" /> Đăng xuất (Thoát)</button>
                 </div>
              </div>
           ) : (
             <Link href="/auth/login" className="block w-full text-center bg-blood-sect border border-blood-sect/50 text-paper-warm py-4 rounded-[4px] font-black shadow-sm font-[family-name:var(--font-heading)] tracking-widest uppercase hover:bg-blood-sect/80 transition-colors">
-              ĐĂNG MÔN NGAY
+              ĐĂNG NHẬP NGAY
             </Link>
           )}
         </div>
