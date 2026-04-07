@@ -1,44 +1,30 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { comicService } from '@/services/comicService';
 import StoryCard, { ComicItem } from '@/components/Story/StoryCard';
-import HeroSection from '@/components/Home/HeroSection';
-import GuidePopup from '@/components/Home/GuidePopup';
-import XianxiaTransition from '@/components/Layout/XianxiaTransition';
-import { FaBolt, FaBookOpen, FaStar } from 'react-icons/fa';
-
-const COMING_SOON_KEYWORDS = ['coming soon', 'sap ra mat', 'sắp ra mắt', 'upcoming', 'soon'];
-
-const isComingSoonComic = (comic: ComicItem) => {
-  const status = String(comic?.status || '').toLowerCase().trim();
-  return COMING_SOON_KEYWORDS.some(keyword => status.includes(keyword));
-};
+import { FaBolt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export default function Home() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['homeComics'],
-    queryFn: comicService.getHome,
-  });
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get('page') || '1');
 
-  const { data: comingSoonData } = useQuery({
-    queryKey: ['comingSoonComicsHome'],
-    queryFn: () => comicService.getList('sap-ra-mat', 1),
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['homeComicsLatest', page],
+    queryFn: () => comicService.getList('truyen-moi', page),
   });
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12 space-y-16 animate-pulse">
-        <div className="w-full h-[60vh] md:h-[80vh] bg-surface-card rounded-3xl"></div>
-        {[1, 2].map(i => (
-          <div key={i} className="space-y-8">
-             <div className="h-8 w-64 bg-surface-card rounded-xl"></div>
-             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-               {[1,2,3,4,5,6].map(j => <div key={j} className="aspect-[2/3.2] bg-surface-card rounded-2xl"></div>)}
-             </div>
-          </div>
-        ))}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 py-12">
+        <div className="h-10 w-72 bg-surface-card rounded-xl mb-12 animate-pulse"></div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(i => (
+            <div key={i} className="aspect-[2/3.2] bg-surface-card rounded-2xl animate-pulse"></div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -60,98 +46,64 @@ export default function Home() {
 
   const items: ComicItem[] = Array.isArray(data?.data?.items) ? data.data.items : [];
   const APP_DOMAIN_CDN_IMAGE = data?.data?.APP_DOMAIN_CDN_IMAGE || '';
-  const comingSoonItems: ComicItem[] = Array.isArray(comingSoonData?.data?.items) ? comingSoonData.data.items : [];
-
-  const featuredComics = items.slice(0, 5);
-  const comingSoonComics = comingSoonItems.filter(isComingSoonComic).slice(0, 12);
-  const newComics = items.slice(6, 24);
-  const fullComics = items.slice(18, 30);
+  const pagination = data?.data?.params?.pagination;
+  const totalItems = pagination?.totalItems || 0;
+  const totalPages = pagination?.totalItemsPerPage
+    ? Math.ceil(totalItems / pagination.totalItemsPerPage)
+    : 1;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 md:px-8 py-8 md:py-12">
-      
-      {/* Spotlight / Hero */}
-      <HeroSection comics={featuredComics} imageDomain={APP_DOMAIN_CDN_IMAGE} />
+    <div className="max-w-7xl mx-auto px-6 md:px-8 py-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex items-center space-x-3">
+          <div className="w-1.5 h-10 bg-accent rounded-full shadow-lg shadow-accent/50"></div>
+          <div>
+            <h1 className="text-3xl md:text-5xl font-black text-text-main uppercase tracking-[0.2em]">Tất Cả Truyện</h1>
+            <p className="text-[10px] md:text-xs text-text-dim font-black uppercase tracking-widest mt-2">Sắp xếp theo truyện mới cập nhật</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+          <FaBolt className="text-accent" />
+          <span className="text-xs font-bold text-text-muted uppercase tracking-wider">{totalItems.toLocaleString()} truyện</span>
+        </div>
+      </div>
 
-      {/* New Updates Section */}
-      <section className="mb-20 relative">
-        <div className="flex items-center justify-between mb-8 pb-4 relative">
-          <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-ink-deep to-transparent opacity-80" style={{ filter: 'url(#ink-roughness)' }}></div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+        {items.map((comic: ComicItem, index: number) => (
+          <StoryCard key={`${comic._id}-${index}`} comic={comic} imageDomain={APP_DOMAIN_CDN_IMAGE} />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="mt-16 flex flex-col items-center space-y-6">
           <div className="flex items-center space-x-4">
-             <div className="w-12 h-12 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] bg-heaven-blue/10 rounded-full border border-heaven-blue/30 shadow-[inset_0_0_10px_rgba(44,74,110,0.1)] flex items-center justify-center relative overflow-hidden">
-               <div className="absolute inset-0 bg-heaven-blue/5 animate-pulse"></div>
-               <FaBolt className="text-heaven-blue relative z-10" />
-             </div>
-             <div>
-               <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
-                 <XianxiaTransition type="ink-drop" delay={400}>Mới Cập Nhật</XianxiaTransition>
-               </h2>
-               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Vừa ra mắt gần đây</p>
-             </div>
-          </div>
-          <Link href="/danh-sach/truyen-moi" className="text-xs font-black text-gold-dim hover:text-heaven-blue hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
-        </div>
-        <XianxiaTransition type="stagger-cards" delay={600}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-            {newComics.map((comic: ComicItem, index: number) => (
-              <StoryCard key={`new-${comic._id}-${index}`} comic={comic} imageDomain={APP_DOMAIN_CDN_IMAGE} />
-            ))}
-          </div>
-        </XianxiaTransition>
-      </section>
+            {page > 1 ? (
+              <Link href={`/?page=${page - 1}`} className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 text-text-main transition-all border border-white/5">
+                <FaChevronLeft />
+              </Link>
+            ) : (
+              <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 opacity-20 text-text-muted border border-white/5 cursor-not-allowed">
+                <FaChevronLeft />
+              </div>
+            )}
 
-      {/* Coming Soon Section */}
-      <section className="mb-20 relative">
-        <div className="flex items-center justify-between mb-8 pb-4 relative">
-          <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-ink-deep to-transparent opacity-80" style={{ filter: 'url(#ink-roughness)' }}></div>
-          <div className="flex items-center space-x-4">
-             <div className="w-12 h-12 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] bg-purple-500/10 rounded-full border border-purple-400/30 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)] flex items-center justify-center relative overflow-hidden">
-               <div className="absolute inset-0 bg-purple-500/5 animate-pulse"></div>
-               <FaStar className="text-purple-300 relative z-10" />
-             </div>
-             <div>
-               <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
-                 <XianxiaTransition type="ink-drop" delay={700}>Truyện Sắp Ra Mắt</XianxiaTransition>
-               </h2>
-               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Danh sách coming soon</p>
-             </div>
-          </div>
-          <Link href="/danh-sach/sap-ra-mat" className="text-xs font-black text-gold-dim hover:text-purple-300 hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
-        </div>
-        <XianxiaTransition type="stagger-cards" delay={800}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-            {comingSoonComics.map((comic: ComicItem, index: number) => (
-              <StoryCard key={`soon-${comic._id}-${index}`} comic={comic} imageDomain={APP_DOMAIN_CDN_IMAGE} />
-            ))}
-          </div>
-        </XianxiaTransition>
-      </section>
+            <div className="glass px-10 py-4 rounded-2xl flex flex-col items-center">
+              <span className="text-[10px] font-black text-text-dim uppercase tracking-[0.3em] mb-1">Trang</span>
+              <span className="text-lg font-black text-accent tracking-widest">{page} / {totalPages}</span>
+            </div>
 
-      {/* Recommendation / Full Comics Section */}
-      <section className="mb-20 relative">
-        <div className="flex items-center justify-between mb-8 pb-4 relative">
-          <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-ink-deep to-transparent opacity-80" style={{ filter: 'url(#ink-roughness)' }}></div>
-          <div className="flex items-center space-x-4">
-             <div className="w-12 h-12 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] bg-jade-green/10 rounded-full border border-jade-green/30 shadow-[inset_0_0_10px_rgba(74,124,89,0.1)] flex items-center justify-center relative overflow-hidden">
-               <div className="absolute inset-0 bg-jade-green/5 animate-pulse"></div>
-               <FaBookOpen className="text-jade-green relative z-10" />
-             </div>
-             <div>
-               <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">Đã Hoàn Thành</h2>
-               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Danh sách trọn bộ</p>
-             </div>
+            {page < totalPages ? (
+              <Link href={`/?page=${page + 1}`} className="w-14 h-14 flex items-center justify-center rounded-2xl bg-accent text-white shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all border border-accent/20">
+                <FaChevronRight />
+              </Link>
+            ) : (
+              <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 opacity-20 text-text-muted border border-white/5 cursor-not-allowed">
+                <FaChevronRight />
+              </div>
+            )}
           </div>
-          <Link href="/danh-sach/hoan-thanh" className="text-xs font-black text-gold-dim hover:text-jade-green hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-          {fullComics.map((comic: ComicItem, index: number) => (
-            <StoryCard key={`full-${comic._id}-${index}`} comic={comic} imageDomain={APP_DOMAIN_CDN_IMAGE} />
-          ))}
-        </div>
-      </section>
-
-      {/* Manual Rank Guide Popup */}
-      <GuidePopup />
+      )}
     </div>
   );
 }

@@ -20,40 +20,23 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
   const [search, setSearch] = React.useState('');
 
   useEffect(() => {
-    if (isOpen) {
-      // "Unrolling" effect
-      gsap.to(scrollRef.current, {
-        height: '80vh',
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power3.out'
-      });
-      gsap.to(contentRef.current, {
+    if (!isOpen) return;
+    gsap.fromTo(
+      scrollRef.current,
+      { opacity: 0, y: 20, height: 0 },
+      { opacity: 1, y: 0, height: '80vh', duration: 0.35, ease: 'power2.out' }
+    );
+    gsap.fromTo(
+      contentRef.current,
+      { opacity: 0, scaleY: 0.95 },
+      {
         opacity: 1,
         scaleY: 1,
-        duration: 0.6,
-        delay: 0.2,
-        ease: 'power4.out',
-        onComplete: () => {
-          setTimeout(() => {
-            inputRef.current?.focus();
-          }, 100);
-        }
-      });
-    } else {
-      gsap.to(contentRef.current, {
-        opacity: 0,
-        scaleY: 0.8,
-        duration: 0.4,
-        ease: 'power4.in'
-      });
-      gsap.to(scrollRef.current, {
-        height: 0,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power3.in'
-      });
-    }
+        duration: 0.25,
+        ease: 'power2.out',
+        onComplete: () => inputRef.current?.focus()
+      }
+    );
   }, [isOpen]);
 
   const filteredChapters = chapters.filter(c => 
@@ -62,17 +45,19 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
 
   const themeClass = theme === 'paper' ? 'bg-slate-800 text-white' : theme === 'night' ? 'bg-ink-black text-mist-gray' : 'bg-[#eef1ec] text-[#2d3e2f]';
 
+  if (!isOpen) return null;
+
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center md:justify-end md:pr-12 pointer-events-none transition-all duration-500 ${isOpen ? 'pointer-events-auto' : ''}`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center md:justify-end md:pr-12 transition-all duration-300">
       {/* Backdrop */}
       <div 
-        className={`absolute inset-0 bg-paper-warm/60 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
+        className="absolute inset-0 bg-paper-warm/60 backdrop-blur-sm transition-opacity duration-300 opacity-100" 
         onClick={onClose}
       />
       
       <div 
         ref={scrollRef}
-        className={`w-[calc(100%-2rem)] max-w-sm md:w-80 h-0 opacity-0 relative border-y-8 border-gold-ancient/40 rounded-t-lg rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${themeClass} z-10 transition-transform duration-500 overflow-visible ${isOpen ? 'translate-y-0' : 'translate-y-4'}`}
+        className={`w-[calc(100%-2rem)] max-w-sm md:w-80 h-0 opacity-0 relative border-y-8 border-gold-ancient/40 rounded-t-lg rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${themeClass} z-10 transition-transform duration-300 translate-y-0 overflow-visible`}
       >
         <div className="absolute inset-0 overflow-hidden rounded-lg pointer-events-none z-0">
            {/* This inner div will handle the "unrolling" clip if needed, but we let the content be visible */}
@@ -85,7 +70,7 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
         <div ref={contentRef} className="h-full pt-4 pb-4 px-3 opacity-0 origin-top flex flex-col">
            <div className="flex items-center justify-between p-3 border-b border-gold-ancient/20">
               <h3 className="font-black font-[family-name:var(--font-heading)] uppercase tracking-widest text-[10px]">Danh sách chương</h3>
-              <button onClick={onClose} className="hover:text-blood-sect transition-colors">
+              <button onClick={onClose} onMouseDown={(e) => e.stopPropagation()} className="hover:text-blood-sect transition-colors">
                  <FaTimes size={16} />
               </button>
            </div>

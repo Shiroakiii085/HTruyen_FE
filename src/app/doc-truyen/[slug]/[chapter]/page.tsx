@@ -18,6 +18,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 const CULTIVATION_TERMS: string[] = [];
 
+const getChapterOrderValue = (chapterName: string) => {
+  const normalized = String(chapterName || '').replace(',', '.');
+  const matched = normalized.match(/\d+(\.\d+)?/);
+  if (!matched) return Number.MAX_SAFE_INTEGER;
+  return Number(matched[0]);
+};
+
 export default function Reader() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -58,9 +65,10 @@ export default function Reader() {
         const res = await comicService.getComicDetail(slug);
         if (res.status === 'success') {
           const allChapters = res.data.item.chapters?.find((s: any) => s.server_data?.length > 0)?.server_data || [];
-          // OTruyen API usually returns ascending [1, 2, 3]. 
-          // Our navigation logic assumes descending [3, 2, 1] (newest at index 0).
-          const sortedChapters = [...allChapters].reverse();
+          // Normalize chapter order so navigation is always consistent.
+          const sortedChapters = [...allChapters].sort((a: any, b: any) => {
+            return getChapterOrderValue(a?.chapter_name) - getChapterOrderValue(b?.chapter_name);
+          });
           setChapterList(sortedChapters);
           setComicInfo({ ...res.data.item, APP_DOMAIN_CDN_IMAGE: res.data.APP_DOMAIN_CDN_IMAGE });
         }
@@ -142,29 +150,24 @@ export default function Reader() {
     }
   }, [user, images.length, loadedImagesCount, slug, chapterName, apiUrl, refreshUser]);
 
-  const currentIndex = chapterList.findIndex(c => c.chapter_name === chapterName);
-  
-  const goToNext = () => {
-    if (currentIndex > 0) {
-      setIsTransitioning(true);
-      const nextChapter = chapterList[currentIndex - 1];
-      setTimeout(() => {
-        router.push(`/doc-truyen/${slug}/${nextChapter.chapter_name}?api=${nextChapter.chapter_api_data}`);
-        setIsTransitioning(false);
-      }, 500);
-    }
+  const currentIndex = chapterList.findIndex(c => String(c.chapter_name) === String(chapterName));
+
+  const goToChapterByOffset = (offset: number) => {
+    const targetIndex = currentIndex + offset;
+    if (targetIndex < 0 || targetIndex >= chapterList.length) return;
+
+    const targetChapter = chapterList[targetIndex];
+    if (!targetChapter?.chapter_name || !targetChapter?.chapter_api_data) return;
+
+    setIsTransitioning(true);
+    setTimeout(() => {
+      router.push(`/doc-truyen/${slug}/${targetChapter.chapter_name}?api=${targetChapter.chapter_api_data}`);
+      setIsTransitioning(false);
+    }, 350);
   };
 
-  const goToPrev = () => {
-    if (currentIndex < chapterList.length - 1) {
-      setIsTransitioning(true);
-      const prevChapter = chapterList[currentIndex + 1];
-      setTimeout(() => {
-        router.push(`/doc-truyen/${slug}/${prevChapter.chapter_name}?api=${prevChapter.chapter_api_data}`);
-        setIsTransitioning(false);
-      }, 500);
-    }
-  };
+  const goToPrev = () => goToChapterByOffset(-1);
+  const goToNext = () => goToChapterByOffset(1);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -349,7 +352,7 @@ export default function Reader() {
             
             <button 
               onClick={goToPrev}
-              disabled={currentIndex === chapterList.length - 1}
+              disabled={currentIndex <= 0}
               className="p-3 bg-white/10 rounded-full border border-white/20 text-white hover:gold-ancient hover:bg-white/20 transition-all disabled:opacity-20 translate-x-[-10px]"
             >
               <FaChevronLeft className="text-xl" />
@@ -362,7 +365,7 @@ export default function Reader() {
 
             <button 
               onClick={goToNext}
-              disabled={currentIndex === 0}
+              disabled={currentIndex < 0 || currentIndex >= chapterList.length - 1}
               className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-bronze-ancient to-gold-dim text-white shadow-xl hover:scale-105 active:scale-95 disabled:grayscale disabled:opacity-50 transition-all"
             >
               <FaChevronLeft className="text-xl rotate-180" />

@@ -18,8 +18,15 @@ interface HeroSectionProps {
 export default function HeroSection({ comics, imageDomain }: HeroSectionProps) {
   if (!comics || comics.length === 0) return null;
   
-  // For now, let's take the first one as the featured comic
-  const featured = comics[0];
+  // Keep a fixed default recommendation when available.
+  const featured =
+    comics.find((comic) => {
+      const normalized = String(comic?.name || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+      return normalized.includes('ta la ta de');
+    }) || comics[0];
   const safeImageDomain = imageDomain || '';
   const imageUrl = safeImageDomain ? `${safeImageDomain}/uploads/comics/${featured.thumb_url}` : '';
 
