@@ -312,12 +312,12 @@ export default function Reader() {
                <FaChevronLeft />
             </Link>
             <div className="flex items-center gap-3">
-               <button 
-                 onClick={() => setIsChapterMenuOpen(true)}
-                 className="px-6 py-2 bg-ink-deep/80 backdrop-blur-md rounded-full border border-gold-dim/30 text-gold-ancient font-black text-xs font-[family-name:var(--font-heading)] uppercase tracking-[0.2em] hover:bg-ink-deep transition-all shadow-lg"
-               >
-                 Danh sách chương
-               </button>
+                <button 
+                  onClick={() => setIsChapterMenuOpen(true)}
+                  className="px-8 py-3 bg-slate-900/80 backdrop-blur-3xl rounded-full border border-gold-ancient/30 text-gold-ancient font-black text-xs font-[family-name:var(--font-heading)] uppercase tracking-[0.2em] hover:bg-slate-800 transition-all shadow-xl hover:shadow-gold-ancient/20 active:scale-95"
+                >
+                  Danh sách chương
+                </button>
             </div>
             <Link href="/" className="p-3 bg-white/5 backdrop-blur-md rounded-full border border-white/10 text-mist-gray hover:text-gold-ancient hover:bg-white/10 transition-all">
                <FaHome />

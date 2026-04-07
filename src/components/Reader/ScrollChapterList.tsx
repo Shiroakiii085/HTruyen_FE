@@ -58,13 +58,19 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
     c.chapter_name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const themeClass = theme === 'paper' ? 'bg-paper-aged text-ink-black' : theme === 'night' ? 'bg-ink-black text-mist-gray' : 'bg-[#eef1ec] text-[#2d3e2f]';
+  const themeClass = theme === 'paper' ? 'bg-slate-800 text-white' : theme === 'night' ? 'bg-ink-black text-mist-gray' : 'bg-[#eef1ec] text-[#2d3e2f]';
 
   return (
-    <div className={`fixed right-10 top-1/2 -translate-y-1/2 z-50 pointer-events-none transition-all ${isOpen ? 'pointer-events-auto' : ''}`}>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center md:justify-end md:pr-12 pointer-events-none transition-all duration-500 ${isOpen ? 'pointer-events-auto' : ''}`}>
+      {/* Backdrop */}
+      <div 
+        className={`absolute inset-0 bg-paper-warm/60 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
+        onClick={onClose}
+      />
+      
       <div 
         ref={scrollRef}
-        className={`w-80 h-0 opacity-0 overflow-hidden relative border-y-8 border-gold-ancient/40 rounded-t-lg rounded-b-lg shadow-[20px_0_50px_rgba(0,0,0,0.5)] ${themeClass}`}
+        className={`w-[calc(100%-2rem)] max-w-sm md:w-80 h-0 opacity-0 overflow-hidden relative border-y-8 border-gold-ancient/40 rounded-t-lg rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${themeClass} z-10 transition-transform duration-500 ${isOpen ? 'translate-y-0' : 'translate-y-4'}`}
       >
         {/* Scroll Cylinders (Top/Bottom) */}
         <div className="absolute top-0 left-[-5%] right-[-5%] h-4 bg-gradient-to-b from-bronze-ancient to-gold-ancient/40 rounded-full z-20 shadow-sm border border-gold-ancient/30"></div>
@@ -80,18 +86,18 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
            </div>
            
            <div className="p-3">
-              <div className="relative">
-                 <input 
-                   ref={inputRef}
-                   type="text" 
-                   placeholder="Tìm chương..."
-                   value={search}
-                   onChange={(e) => setSearch(e.target.value)}
-                   className="w-full bg-white/10 border border-gold-ancient/30 rounded-md py-2.5 px-8 text-xs focus:outline-none focus:border-gold-ancient transition-all placeholder:text-mist-gray/50"
-                 />
-                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-ancient/60" size={12} />
-              </div>
-           </div>
+               <div className="relative">
+                  <input 
+                    ref={inputRef}
+                    type="text" 
+                    placeholder="Tìm chương..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full bg-white/5 border border-gold-ancient/20 rounded-xl py-2.5 px-10 text-xs focus:outline-none focus:border-gold-ancient/50 transition-all placeholder:text-text-dim text-text-main shadow-inner"
+                  />
+                  <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gold-ancient/50" size={12} />
+               </div>
+            </div>
 
            <div className="flex-1 overflow-y-auto custom-scrollbar px-2 space-y-1">
               {filteredChapters.map((chapter, idx) => (

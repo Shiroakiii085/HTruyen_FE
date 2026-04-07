@@ -15,6 +15,17 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const userMenuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const realmInfo = user ? getRealmInfo(user.level || 1, user.exp || 0) : null;
   const currentRealm = realmInfo ? LEVEL_SYSTEM.find(r => r.level === realmInfo.level) : null;
@@ -71,29 +82,29 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex flex-1 justify-center items-center space-x-10">
             {['Trang chủ', 'Mới cập nhật', 'Truyện Hot', 'Thể loại'].map((item, idx) => (
-              <Link 
-                key={idx}
-                href={idx === 0 ? '/' : idx === 3 ? '/the-loai' : `/danh-sach/truyen-${idx === 1 ? 'moi' : 'hot'}`} 
-                className="relative text-paper-warm hover:text-gold-ancient font-semibold text-sm uppercase tracking-[0.15em] transition-colors py-1.5 font-[family-name:var(--font-heading)] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-gold-ancient after:origin-left after:[clip-path:inset(0_100%_0_0)] hover:after:[clip-path:inset(0_0_0_0)] after:transition-[clip-path] after:duration-500 after:ease-out"
-              >
-                {item}
-              </Link>
+                <Link 
+                  key={idx}
+                  href={idx === 0 ? '/' : idx === 3 ? '/the-loai' : `/danh-sach/truyen-${idx === 1 ? 'moi' : 'hot'}`} 
+                  className="relative text-text-muted hover:text-gold-ancient font-semibold text-sm uppercase tracking-[0.15em] transition-colors py-1.5 font-[family-name:var(--font-heading)] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-gold-ancient after:origin-left after:[clip-path:inset(0_100%_0_0)] hover:after:[clip-path:inset(0_0_0_0)] after:transition-[clip-path] after:duration-500 after:ease-out"
+                >
+                  {item}
+                </Link>
             ))}
           </div>
 
           {/* Search & Auth */}
           <div className="hidden md:flex items-center flex-1 justify-end space-x-6">
             <div className="relative group">
-              <div className="relative group before:content-[''] before:absolute before:left-[-10px] before:top-[-4px] before:bottom-[-4px] before:w-[20px] before:bg-gold-dim before:rounded-full before:z-0 after:content-[''] after:absolute after:right-[-10px] after:top-[-4px] after:bottom-[-4px] after:w-[20px] after:bg-gold-dim after:rounded-full after:z-0">
+              <div className="relative group flex items-center">
                 <input 
                   type="text" 
                   placeholder="Tìm truyện..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearch}
-                  className="relative z-10 bg-[#e8dbbf] text-ink-deep border-y-2 border-gold-ancient py-2 pl-4 pr-10 focus:outline-none focus:bg-paper-warm transition-all w-48 group-focus-within:w-64 placeholder:text-ink-deep/60 text-sm font-[family-name:var(--font-heading)] rounded-none shadow-[inset_0_2px_4px_rgba(26,20,16,0.3)]"
+                  className="relative z-10 bg-white/5 text-text-main border border-white/10 py-2.5 pl-4 pr-10 focus:outline-none focus:bg-white/10 focus:border-gold-ancient/50 transition-all w-48 group-focus-within:w-64 placeholder:text-text-dim text-sm font-[family-name:var(--font-heading)] rounded-xl shadow-inner"
                 />
-                <FaSearch className="absolute right-2 top-3 z-20 text-ink-deep group-focus-within:text-blood-sect transition-colors cursor-pointer" size={14} />
+                <FaSearch className="absolute right-3.5 top-3 z-20 text-text-dim group-focus-within:text-gold-ancient transition-colors cursor-pointer" size={14} />
               </div>
             </div>
 
@@ -110,13 +121,14 @@ export default function Navbar() {
                 </button>
                 
                 <div 
-                  className={`absolute right-0 top-full mt-2 w-52 bg-ink-deep/95 rounded-[4px] shadow-md py-2 border border-gold-dim/30 origin-top-right transform transition-all duration-200 backdrop-blur-xl z-[100] ${
-                    isUserMenuOpen ? 'visible opacity-100 scale-100' : 'invisible opacity-0 scale-95'
+                  ref={userMenuRef}
+                  className={`absolute right-0 top-full mt-2 w-52 bg-slate-900 shadow-2xl py-2 border border-white/10 origin-top-right transform transition-all duration-200 backdrop-blur-3xl z-[100] rounded-2xl overflow-hidden ${
+                    isUserMenuOpen ? 'visible opacity-100 scale-100 translate-y-0' : 'invisible opacity-0 scale-95 -translate-y-2'
                   }`}
                 >
                   <div className="px-4 py-3 border-b border-gold-dim/20 mb-1">
                     <p className="text-[10px] text-mist-gray font-black uppercase tracking-[0.2em] font-[family-name:var(--font-heading)]">Tài khoản</p>
-                    <p className="text-sm text-paper-warm font-bold truncate font-[family-name:var(--font-heading)]">{user.username}</p>
+                    <p className="text-sm text-text-main font-bold truncate font-[family-name:var(--font-heading)]">{user.username}</p>
                     
                     {realmInfo && currentRealm && (
                       <div className="mt-4 p-3 bg-white/5 rounded-2xl border border-white/5 group/realm relative overflow-hidden">
@@ -202,8 +214,9 @@ export default function Navbar() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="w-full bg-paper-aged text-white py-3 px-5 rounded-[4px] border border-gold-dim/30 focus:ring-2 focus:ring-blood-sect/50 outline-none placeholder:text-mist-gray text-sm font-[family-name:var(--font-heading)]" 
+              className="w-full bg-white/5 text-text-main py-4 px-6 rounded-2xl border border-white/10 focus:ring-2 focus:ring-gold-ancient/30 outline-none placeholder:text-text-dim text-sm font-[family-name:var(--font-heading)] shadow-inner" 
             />
+            <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-text-dim" size={14} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             {['Trang chủ', 'Mới cập nhật', 'Truyện Hot', 'Thể loại'].map((item, idx) => (
@@ -217,7 +230,7 @@ export default function Navbar() {
                 <div className="flex items-center space-x-4 mb-3 p-4 bg-paper-aged/10 border border-gold-dim/30 rounded-[4px]">
                   <img src={user.avatar} className="w-12 h-12 rounded-[2px] border border-gold-ancient/40 shadow-sm object-cover" alt="avatar" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-paper-warm font-bold truncate font-[family-name:var(--font-heading)]">{user.username}</p>
+                    <p className="text-text-main font-bold truncate font-[family-name:var(--font-heading)]">{user.username}</p>
                     <p className="text-xs text-mist-gray truncate">{user.email}</p>
                   </div>
                 </div>
