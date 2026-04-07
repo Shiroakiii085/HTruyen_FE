@@ -35,7 +35,9 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
         delay: 0.2,
         ease: 'power4.out',
         onComplete: () => {
-          inputRef.current?.focus();
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 100);
         }
       });
     } else {
@@ -70,8 +72,11 @@ export default function ScrollChapterList({ isOpen, onClose, chapters, currentCh
       
       <div 
         ref={scrollRef}
-        className={`w-[calc(100%-2rem)] max-w-sm md:w-80 h-0 opacity-0 overflow-hidden relative border-y-8 border-gold-ancient/40 rounded-t-lg rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${themeClass} z-10 transition-transform duration-500 ${isOpen ? 'translate-y-0' : 'translate-y-4'}`}
+        className={`w-[calc(100%-2rem)] max-w-sm md:w-80 h-0 opacity-0 relative border-y-8 border-gold-ancient/40 rounded-t-lg rounded-b-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${themeClass} z-10 transition-transform duration-500 overflow-visible ${isOpen ? 'translate-y-0' : 'translate-y-4'}`}
       >
+        <div className="absolute inset-0 overflow-hidden rounded-lg pointer-events-none z-0">
+           {/* This inner div will handle the "unrolling" clip if needed, but we let the content be visible */}
+        </div>
         {/* Scroll Cylinders (Top/Bottom) */}
         <div className="absolute top-0 left-[-5%] right-[-5%] h-4 bg-gradient-to-b from-bronze-ancient to-gold-ancient/40 rounded-full z-20 shadow-sm border border-gold-ancient/30"></div>
         <div className="absolute bottom-0 left-[-5%] right-[-5%] h-4 bg-gradient-to-t from-bronze-ancient to-gold-ancient/40 rounded-full z-20 shadow-sm border border-gold-ancient/30"></div>

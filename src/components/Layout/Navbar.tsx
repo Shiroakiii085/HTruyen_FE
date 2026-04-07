@@ -67,9 +67,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-7xl bg-ink-deep/90 backdrop-blur-xl rounded-[4px] shadow-[0_4px_20px_rgba(26,20,16,0.7)] transition-all duration-300 translate-y-0 border border-gold-dim/40 overflow-hidden relative">
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper-2.png')] opacity-20 pointer-events-none mix-blend-multiply"></div>
-      <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white/5 to-transparent pointer-events-none opacity-30 mask-image-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxwYXRoIGQ9Ik0wLDEwMCBMMjAsODAgTDQwLDkwIEw2MCw1MCBMODAsNzAgTDEwMCw0MCBMMTAwLDEwMCBaIiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==')]"></div>
+    <nav className="sticky top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-7xl bg-ink-deep/90 backdrop-blur-xl rounded-[4px] shadow-[0_4px_20px_rgba(26,20,16,0.7)] transition-all duration-300 translate-y-0 border border-gold-dim/40 relative">
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper-2.png')] opacity-20 pointer-events-none mix-blend-multiply rounded-[4px]"></div>
+      <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white/5 to-transparent pointer-events-none opacity-30 mask-image-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxwYXRoIGQ9Ik0wLDEwMCBMMjAsODAgTDQwLDkwIEw2MCw1MCBMODAsNzAgTDEwMCw0MCBMMTAwLDEwMCBaIiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==')] rounded-b-[4px]"></div>
       <div className="px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex justify-between items-center h-14 md:h-16">
           {/* Logo */}
@@ -80,7 +80,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex flex-1 justify-center items-center space-x-10">
+          <div className="hidden md:flex flex-none items-center space-x-12 ml-16">
             {['Trang chủ', 'Mới cập nhật', 'Truyện Hot', 'Thể loại'].map((item, idx) => (
                 <Link 
                   key={idx}
