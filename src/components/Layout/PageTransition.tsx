@@ -20,31 +20,30 @@ export default function PageTransition({ children }: { children: React.ReactNode
     // Identify stagger items (like novel cards) built-in anime-stagger-item class
     animate('.anime-stagger-item', {
       opacity: [0, 1],
-      translateY: [20, 0],
-      delay: stagger(150, { start: 500 }),
-      easing: 'spring(1, 80, 10, 0)',
-      duration: 1000,
+      translateY: [10, 0],
+      delay: stagger(100, { start: 200 }),
+      duration: 800,
+      easing: 'easeOutQuart',
     });
     
   }, []);
 
   return (
     <>
-      {/* Ink Drop Spread Overlay (Fades out quickly) */}
+      {/* Premium Minimal Splash */}
       <div 
-        className={`fixed inset-0 bg-ink-black z-[100] pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center ${mounted ? 'opacity-0 scale-[5]' : 'opacity-100 scale-100'}`}
-        style={{
-           WebkitMaskImage: 'radial-gradient(circle, transparent 10%, black 70%)',
-           maskImage: 'radial-gradient(circle, transparent 10%, black 70%)'
-        }}
+        className={`fixed inset-0 bg-[#0a0b14] z-[100] flex items-center justify-center transition-opacity duration-700 pointer-events-none ${mounted ? 'opacity-0' : 'opacity-100'}`}
       >
-         <div className="text-gold-ancient/20 font-black text-9xl tracking-[0.5em] font-[family-name:var(--font-heading)] blur-md">
-            KIẾM LAI CÁC
-         </div>
+        <div className="text-center">
+          <div className="text-4xl font-black tracking-[0.4em] text-white animate-pulse">
+            HTRUYEN
+          </div>
+          <div className="h-[2px] w-12 bg-gold-ancient mt-4 mx-auto"></div>
+        </div>
       </div>
       
       {/* Main Content wrapper */}
-      <div className={`transition-opacity duration-700 delay-300 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
         {children}
       </div>
     </>

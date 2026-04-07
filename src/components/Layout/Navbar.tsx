@@ -62,8 +62,8 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-14 md:h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 flex items-center group">
-            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-gold-ancient to-paper-warm bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(201,168,76,0.6)] group-hover:drop-shadow-[0_0_15px_rgba(201,168,76,1)] transition-all duration-300 font-[family-name:var(--font-heading)] tracking-wider">
-              Kiếm Lai
+            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-jade-green to-heaven-blue bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:drop-shadow-[0_0_15px_rgba(16,185,129,0.6)] transition-all duration-300 font-[family-name:var(--font-heading)] tracking-wider">
+              HTruyen
             </span>
           </Link>
 

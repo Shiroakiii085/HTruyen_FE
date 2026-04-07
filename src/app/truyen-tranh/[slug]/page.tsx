@@ -89,7 +89,7 @@ export default function ComicDetail() {
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-black text-ink-black leading-tight drop-shadow-md font-[family-name:var(--font-heading)]">{comic.name}</h1>
               <p className="text-mist-gray font-bold text-sm md:text-base tracking-widest uppercase opacity-80 border-l-2 border-gold-dim/30 pl-3">
-                {comic.origin_name?.join(' • ') || 'Kiếm Lai Các Original'}
+                {comic.origin_name?.join(' • ') || 'HTruyen Original'}
               </p>
             </div>
 

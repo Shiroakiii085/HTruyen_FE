@@ -28,7 +28,7 @@ export default function ReadingContainer({ children, title, chapterName, theme }
                 </svg>
              </div>
              <div className="text-left">
-                <h2 className="text-blood-sect font-black text-xs uppercase tracking-[0.3em] font-[family-name:var(--font-heading)]">Kiếm Lai • Quyển Nhất</h2>
+                <h2 className="text-jade-green font-black text-xs uppercase tracking-[0.3em] font-[family-name:var(--font-heading)]">HTruyen • Thư Các</h2>
                 <h1 className="text-4xl md:text-5xl font-black font-[family-name:var(--font-heading)] text-ink-black mt-1 drop-shadow-sm">
                   {title}
                 </h1>

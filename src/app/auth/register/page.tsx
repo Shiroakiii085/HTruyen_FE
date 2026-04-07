@@ -65,7 +65,7 @@ export default function Register() {
 
         <div className="text-center mb-10">
           <Link href="/" className="inline-block text-3xl font-black text-ink-black mb-4 font-[family-name:var(--font-heading)] drop-shadow-sm border-b border-gold-dim/30 pb-2">
-            Kiếm Lai Các
+            HTruyen
           </Link>
           <h2 className="text-3xl font-black text-ink-deep tracking-tight uppercase font-[family-name:var(--font-heading)]">Khắc Hoạ Ngọc Giản</h2>
           <p className="text-mist-gray mt-3 font-bold text-xs tracking-[0.2em] uppercase opacity-90 border-l border-gold-dim/40 pl-2 mx-auto w-fit">Tạo thân phận để hành tẩu giang hồ</p>

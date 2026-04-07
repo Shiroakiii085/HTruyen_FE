@@ -10,9 +10,6 @@ const FORBIDDEN_KEYWORDS = ['ngôn tình', 'đam mỹ', 'romance', 'shoujo', 'ge
 const filterComics = (items: any[]) => {
   if (!items) return [];
   return items.filter(item => {
-    // Hide comics with no chapters
-    if (!item.chaptersLatest || item.chaptersLatest.length === 0) return false;
-
     // Check item.category or item.categories
     const categories = item.category || item.categories;
     if (!categories || !Array.isArray(categories)) return true;
