@@ -57,7 +57,7 @@ export default function Reader() {
       try {
         const res = await comicService.getComicDetail(slug);
         if (res.status === 'success') {
-          const allChapters = res.data.item.chapters?.[0]?.server_data || [];
+          const allChapters = res.data.item.chapters?.find((s: any) => s.server_data?.length > 0)?.server_data || [];
           // OTruyen API usually returns ascending [1, 2, 3]. 
           // Our navigation logic assumes descending [3, 2, 1] (newest at index 0).
           const sortedChapters = [...allChapters].reverse();

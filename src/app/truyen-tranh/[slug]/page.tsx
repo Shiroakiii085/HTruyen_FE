@@ -43,7 +43,7 @@ export default function ComicDetail() {
 
   const comic = data.data.item;
   const imageDomain = data.data.APP_DOMAIN_CDN_IMAGE;
-  const chapters = comic.chapters?.[0]?.server_data || [];
+  const chapters = comic.chapters?.find((s: any) => s.server_data?.length > 0)?.server_data || [];
   const thumbUrl = `${imageDomain}/uploads/comics/${comic.thumb_url}`;
   
   const firstChapter = chapters.length > 0 ? chapters[0] : null;

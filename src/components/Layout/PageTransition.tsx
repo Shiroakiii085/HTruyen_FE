@@ -18,13 +18,16 @@ export default function PageTransition({ children }: { children: React.ReactNode
     }
 
     // Identify stagger items (like novel cards) built-in anime-stagger-item class
-    animate('.anime-stagger-item', {
-      opacity: [0, 1],
-      translateY: [10, 0],
-      delay: stagger(100, { start: 200 }),
-      duration: 800,
-      easing: 'easeOutQuart',
-    });
+    const staggerItems = document.querySelectorAll('.anime-stagger-item');
+    if (staggerItems.length > 0) {
+      animate('.anime-stagger-item', {
+        opacity: [0, 1],
+        translateY: [10, 0],
+        delay: stagger(100, { start: 200 }),
+        duration: 800,
+        easing: 'easeOutQuart',
+      });
+    }
     
   }, []);
 

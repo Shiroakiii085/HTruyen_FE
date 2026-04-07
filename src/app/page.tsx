@@ -110,7 +110,7 @@ export default function Home() {
               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Truyện được đọc nhiều nhất</p>
             </div>
           </div>
-          <Link href="/truyen-hot" className="text-xs font-black text-gold-dim hover:text-blood-sect hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
+          <Link href="/danh-sach/truyen-hot" className="text-xs font-black text-gold-dim hover:text-blood-sect hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
         </div>
         <XianxiaTransition type="stagger-cards" delay={200}>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">

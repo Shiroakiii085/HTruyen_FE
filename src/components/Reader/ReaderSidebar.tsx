@@ -28,8 +28,8 @@ export default function ReaderSidebar({ fontSize, setFontSize, theme, setTheme, 
                 onChange={(e) => setFontSize(parseInt(e.target.value))}
                 className="h-full appearance-none bg-transparent cursor-pointer vertical-range-slider"
                 style={{
-                  WebkitAppearance: 'slider-vertical',
-                  writingMode: 'bt-lr'
+                  writingMode: 'vertical-lr',
+                  direction: 'rtl'
                 } as any}
               />
               {/* Bamboo Segments (Visual Overlay) */}
