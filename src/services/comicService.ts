@@ -43,11 +43,16 @@ const isComingSoonComic = (item: any) => {
   return COMING_SOON_KEYWORDS.some(keyword => status.includes(keyword));
 };
 
+const removeComingSoonComics = (items: any[]) => {
+  if (!items) return [];
+  return items.filter(item => !isComingSoonComic(item));
+};
+
 export const comicService = {
   getHome: async () => {
     const res = await api.get('/proxy/home');
     if (res.data?.data?.items) {
-      res.data.data.items = filterComics(res.data.data.items);
+      res.data.data.items = removeComingSoonComics(filterComics(res.data.data.items));
     }
     return res.data;
   },
@@ -58,7 +63,7 @@ export const comicService = {
       const filteredItems = filterComics(res.data.data.items);
       res.data.data.items = type === 'sap-ra-mat'
         ? filteredItems.filter(isComingSoonComic)
-        : filteredItems;
+        : removeComingSoonComics(filteredItems);
     }
     return res.data;
   },
@@ -72,7 +77,7 @@ export const comicService = {
   getCategoryDetail: async (slug: string, page: number = 1) => {
     const res = await api.get(`/proxy/the-loai/${slug}?page=${page}`);
     if (res.data?.data?.items) {
-      res.data.data.items = filterComics(res.data.data.items);
+      res.data.data.items = removeComingSoonComics(filterComics(res.data.data.items));
     }
     return res.data;
   },
@@ -83,7 +88,7 @@ export const comicService = {
   search: async (keyword: string, page: number = 1) => {
     const res = await api.get(`/proxy/tim-kiem?keyword=${keyword}&page=${page}`);
     if (res.data?.data?.items) {
-      res.data.data.items = filterComics(res.data.data.items);
+      res.data.data.items = removeComingSoonComics(filterComics(res.data.data.items));
     }
     return res.data;
   },

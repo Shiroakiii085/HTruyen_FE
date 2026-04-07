@@ -75,8 +75,8 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-7xl bg-ink-deep/90 backdrop-blur-xl rounded-[4px] shadow-[0_4px_20px_rgba(26,20,16,0.7)] transition-all duration-300 translate-y-0 border border-gold-dim/40 relative">
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper-2.png')] opacity-20 pointer-events-none mix-blend-multiply rounded-[4px]"></div>
+    <nav className="sticky top-0 z-50 w-full bg-ink-deep/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(26,20,16,0.7)] transition-all duration-300 translate-y-0 border-b border-gold-dim/40 relative">
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper-2.png')] opacity-20 pointer-events-none mix-blend-multiply"></div>
       <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white/5 to-transparent pointer-events-none opacity-30 mask-image-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxwYXRoIGQ9Ik0wLDEwMCBMMjAsODAgTDQwLDkwIEw2MCw1MCBMODAsNzAgTDEwMCw0MCBMMTAwLDEwMCBaIiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==')] rounded-b-[4px]"></div>
       <div className="px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex justify-between items-center h-14 md:h-16">
@@ -213,8 +213,8 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Nav */}
-      <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-[36rem] opacity-100 border-t border-gold-dim/30' : 'max-h-0 opacity-0'}`}>
-        <div className="px-4 py-6 space-y-5 bg-ink-deep/95 backdrop-blur-xl">
+      <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-[calc(100vh-56px)] opacity-100 border-t border-gold-dim/30' : 'max-h-0 opacity-0'}`}>
+        <div className="px-4 py-6 space-y-5 bg-ink-deep/95 backdrop-blur-xl overflow-y-auto overscroll-contain max-h-[calc(100vh-56px)] pb-10">
           <div className="relative">
             <input 
               type="text" 

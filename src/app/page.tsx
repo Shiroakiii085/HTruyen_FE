@@ -3,12 +3,11 @@ import React from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { comicService } from '@/services/comicService';
-import { statsService } from '@/services/statsService';
 import StoryCard, { ComicItem } from '@/components/Story/StoryCard';
 import HeroSection from '@/components/Home/HeroSection';
 import GuidePopup from '@/components/Home/GuidePopup';
 import XianxiaTransition from '@/components/Layout/XianxiaTransition';
-import { FaFire, FaBolt, FaBookOpen, FaStar, FaChartLine } from 'react-icons/fa';
+import { FaBolt, FaBookOpen, FaStar } from 'react-icons/fa';
 
 const COMING_SOON_KEYWORDS = ['coming soon', 'sap ra mat', 'sắp ra mắt', 'upcoming', 'soon'];
 
@@ -23,9 +22,9 @@ export default function Home() {
     queryFn: comicService.getHome,
   });
 
-  const { data: mostReadData } = useQuery({
-    queryKey: ['mostRead'],
-    queryFn: statsService.getMostRead,
+  const { data: comingSoonData } = useQuery({
+    queryKey: ['comingSoonComicsHome'],
+    queryFn: () => comicService.getList('sap-ra-mat', 1),
   });
 
   if (isLoading) {
@@ -61,41 +60,11 @@ export default function Home() {
 
   const items: ComicItem[] = Array.isArray(data?.data?.items) ? data.data.items : [];
   const APP_DOMAIN_CDN_IMAGE = data?.data?.APP_DOMAIN_CDN_IMAGE || '';
-
-  const itemMapBySlug = new Map(
-    items.map((comic: ComicItem) => [comic.slug?.toLowerCase(), comic])
-  );
-
-  // Most Read Logic: Use internal stats if available, with fallback fields from home list
-  const hotComics = mostReadData && mostReadData.length > 0 
-    ? mostReadData
-        .filter(stat => Boolean(stat))
-        .filter(stat => {
-          const slug = String(stat?.comicSlug || '').toLowerCase();
-          const name = String(stat?.comicName || '').toLowerCase();
-          const FORBIDDEN_KEYWORDS = ['ngôn tình', 'đam mỹ', 'romance', 'shoujo', 'gender bender', 'yuri', 'yaoi'];
-          return !FORBIDDEN_KEYWORDS.some(kw => name.includes(kw) || slug.includes(kw));
-        })
-        .map(stat => {
-          const fallbackComic = itemMapBySlug.get(String(stat?.comicSlug || '').toLowerCase());
-          return {
-            _id: stat?.comicSlug || fallbackComic?._id || '',
-            slug: stat?.comicSlug || fallbackComic?.slug || '',
-            name: stat?.comicName || fallbackComic?.name || 'Đang cập nhật',
-            thumb_url: stat?.thumbUrl || fallbackComic?.thumb_url || '',
-            chaptersLatest: fallbackComic?.chaptersLatest || [], // Chapter info is missing in stats
-            status: fallbackComic?.status || '',
-            sub_docquyen: fallbackComic?.sub_docquyen || false,
-            category: fallbackComic?.category || [],
-            updatedAt: stat?.lastReadAt || fallbackComic?.updatedAt || '',
-            origin_name: fallbackComic?.origin_name || []
-          } as ComicItem;
-        }).slice(0, 12)
-    : items.slice(0, 12);
+  const comingSoonItems: ComicItem[] = Array.isArray(comingSoonData?.data?.items) ? comingSoonData.data.items : [];
 
   const featuredComics = items.slice(0, 5);
-  const comingSoonComics = items.filter(isComingSoonComic).slice(0, 12);
-  const newComics = items.filter(comic => !isComingSoonComic(comic)).slice(6, 24);
+  const comingSoonComics = comingSoonItems.filter(isComingSoonComic).slice(0, 12);
+  const newComics = items.slice(6, 24);
   const fullComics = items.slice(18, 30);
 
   return (
@@ -103,41 +72,6 @@ export default function Home() {
       
       {/* Spotlight / Hero */}
       <HeroSection comics={featuredComics} imageDomain={APP_DOMAIN_CDN_IMAGE} />
-
-      {/* Hot Section */}
-      <section className="mb-20 relative">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-gold-ancient/5 rounded-full blur-3xl -z-10 -translate-y-1/2 -translate-x-1/2"></div>
-        <div className="flex items-center justify-between mb-8 pb-4 relative">
-          <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-ink-deep to-transparent opacity-80" style={{ filter: 'url(#ink-roughness)' }}></div>
-          {/* SVG filter hidden at the top of the body or here to simulate ink bleed */}
-          <svg width="0" height="0" className="absolute">
-            <filter id="ink-roughness">
-              <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
-              <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
-            </filter>
-          </svg>
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] bg-gold-ancient/10 rounded-full border border-gold-dim/30 shadow-[inset_0_0_10px_rgba(201,168,76,0.1)] flex items-center justify-center relative overflow-hidden">
-               <div className="absolute inset-0 bg-gold-ancient/5 animate-pulse"></div>
-               <FaFire className="text-blood-sect relative z-10" />
-            </div>
-            <div>
-              <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
-                <XianxiaTransition type="ink-drop">Thịnh Hành</XianxiaTransition>
-              </h2>
-              <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Truyện được đọc nhiều nhất</p>
-            </div>
-          </div>
-          <Link href="/danh-sach/truyen-hot" className="text-xs font-black text-gold-dim hover:text-blood-sect hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
-        </div>
-        <XianxiaTransition type="stagger-cards" delay={200}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-            {hotComics.map((comic: ComicItem, index: number) => (
-              <StoryCard key={`${comic._id}-${index}`} comic={comic} imageDomain={APP_DOMAIN_CDN_IMAGE} />
-            ))}
-          </div>
-        </XianxiaTransition>
-      </section>
 
       {/* New Updates Section */}
       <section className="mb-20 relative">
