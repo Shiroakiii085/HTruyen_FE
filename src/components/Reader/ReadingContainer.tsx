@@ -4,11 +4,10 @@ import React from 'react';
 interface ReadingContainerProps {
   children: React.ReactNode;
   title: string;
-  chapterName: string;
   theme: 'paper' | 'night' | 'bamboo';
 }
 
-export default function ReadingContainer({ children, title, chapterName, theme }: ReadingContainerProps) {
+export default function ReadingContainer({ children, title, theme }: ReadingContainerProps) {
   const themeClass = theme === 'paper' ? 'parchment-bg' : theme === 'night' ? 'theme-night' : 'theme-bamboo';
 
   return (
@@ -29,15 +28,10 @@ export default function ReadingContainer({ children, title, chapterName, theme }
              </div>
              <div className="text-left">
                 <h2 className="text-jade-green font-black text-xs uppercase tracking-[0.3em] font-[family-name:var(--font-heading)]">HTruyen • Thư Các</h2>
-                <h1 className="text-4xl md:text-5xl font-black font-[family-name:var(--font-heading)] text-text-main mt-1 drop-shadow-sm">
+                <h1 className="text-4xl md:text-5xl font-black font-[family-name:var(--font-heading)] text-white mt-1 drop-shadow-sm">
                   {title}
                 </h1>
              </div>
-          </div>
-          <div className="flex items-center justify-center gap-4 text-ink-deep/60">
-             <div className="h-[1px] w-12 bg-gold-ancient/40"></div>
-             <span className="text-sm font-bold tracking-widest font-[family-name:var(--font-heading)]">CHƯƠNG {chapterName}</span>
-             <div className="h-[1px] w-12 bg-gold-ancient/40"></div>
           </div>
         </header>
 

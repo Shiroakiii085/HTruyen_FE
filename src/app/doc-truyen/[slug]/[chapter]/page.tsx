@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { comicService } from '@/services/comicService';
-import { FaChevronLeft, FaHome, FaListUl, FaArrowUp, FaCog, FaExpand, FaCompress, FaSearch, FaChevronDown, FaMoon, FaSun } from 'react-icons/fa';
+import { FaChevronLeft, FaHome } from 'react-icons/fa';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
@@ -46,8 +46,6 @@ export default function Reader() {
   const [comicInfo, setComicInfo] = useState<any>(null);
   const [loadedImagesCount, setLoadedImagesCount] = useState(0);
   const [isChapterMenuOpen, setIsChapterMenuOpen] = useState(false);
-  const [chapterSearch, setChapterSearch] = useState('');
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [theme, setTheme] = useState<'paper' | 'night' | 'bamboo'>('paper');
   const [fontSize, setFontSize] = useState(20);
   const [fontFamily, setFontFamily] = useState<'serif' | 'sans'>('serif');
@@ -159,11 +157,7 @@ export default function Reader() {
     const targetChapter = chapterList[targetIndex];
     if (!targetChapter?.chapter_name || !targetChapter?.chapter_api_data) return;
 
-    setIsTransitioning(true);
-    setTimeout(() => {
-      router.push(`/doc-truyen/${slug}/${targetChapter.chapter_name}?api=${targetChapter.chapter_api_data}`);
-      setIsTransitioning(false);
-    }, 350);
+    router.push(`/doc-truyen/${slug}/${targetChapter.chapter_name}?api=${targetChapter.chapter_api_data}`);
   };
 
   const goToPrev = () => goToChapterByOffset(-1);
@@ -280,7 +274,7 @@ export default function Reader() {
   }
 
   return (
-    <div className={`min-h-screen relative transition-opacity duration-700 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+    <div className="min-h-screen relative">
       {/* Absolute Top Progress - Sword Qi */}
       <div className="fixed top-0 left-0 w-full h-[3px] bg-ink-deep/10 z-[100] pointer-events-none overflow-hidden">
         <div 
@@ -330,7 +324,6 @@ export default function Reader() {
 
       <ReadingContainer 
         title={comicInfo?.name || slug} 
-        chapterName={chapterName}
         theme={theme}
       >
         {renderContent()}

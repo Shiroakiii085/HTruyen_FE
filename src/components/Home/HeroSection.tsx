@@ -28,7 +28,9 @@ export default function HeroSection({ comics, imageDomain }: HeroSectionProps) {
       return normalized.includes('ta la ta de');
     }) || comics[0];
   const safeImageDomain = imageDomain || '';
-  const imageUrl = safeImageDomain ? `${safeImageDomain}/uploads/comics/${featured.thumb_url}` : '';
+  const imageUrl = featured.thumb_url?.startsWith('http')
+    ? featured.thumb_url
+    : (safeImageDomain ? `${safeImageDomain}/uploads/comics/${featured.thumb_url}` : '');
 
   const bgRef = useRef<HTMLImageElement>(null);
 

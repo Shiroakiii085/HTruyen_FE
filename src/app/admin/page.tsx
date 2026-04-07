@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { adminService, MostReadStatistic, ReaderCounts } from '@/services/adminService';
+import { adminService, FeaturedComicConfig, FeaturedComicItem, MostReadStatistic, ReaderCounts } from '@/services/adminService';
 import { FaChartLine, FaFire, FaHistory, FaCalendarAlt, FaCalendarCheck, FaCalendarPlus, FaArrowLeft } from 'react-icons/fa';
 import Link from 'next/link';
 
@@ -13,6 +13,11 @@ export default function AdminDashboard() {
   const [readerCounts, setReaderCounts] = useState<ReaderCounts | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'day' | 'month' | 'year'>('day');
+  const [featured, setFeatured] = useState<FeaturedComicConfig | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState<FeaturedComicItem[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [savedMessage, setSavedMessage] = useState('');
 
   useEffect(() => {
     if (!user || user.role?.toLowerCase() !== 'admin') {
@@ -23,12 +28,14 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [mostReadData, readerData] = await Promise.all([
+        const [mostReadData, readerData, featuredData] = await Promise.all([
           adminService.getMostReadStatistics(),
-          adminService.getReaderCounts()
+          adminService.getReaderCounts(),
+          adminService.getFeaturedComic()
         ]);
         setMostRead(mostReadData);
         setReaderCounts(readerData);
+        setFeatured(featuredData);
       } catch (err) {
         console.error("Failed to fetch admin data:", err);
       } finally {
@@ -37,6 +44,7 @@ export default function AdminDashboard() {
     };
 
     fetchData();
+
   }, [user, router]);
 
   const getFullThumbUrl = (url: string) => {
@@ -56,6 +64,34 @@ export default function AdminDashboard() {
 
   const currentStats = readerCounts ? (activeTab === 'day' ? readerCounts.daily : activeTab === 'month' ? readerCounts.monthly : readerCounts.yearly) : [];
   const maxCount = Math.max(...currentStats.map(s => s.count), 1);
+
+  const handleSearch = async () => {
+    if (!searchKeyword.trim()) return;
+    setSearching(true);
+    try {
+      const items = await adminService.searchComicsForFeatured(searchKeyword.trim());
+      setSearchResults(items);
+    } catch (err) {
+      console.error('Search featured comics error:', err);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const saveFeaturedComic = async (item: FeaturedComicItem) => {
+    await adminService.setFeaturedComic({
+      comicSlug: item.slug,
+      comicName: item.name,
+      thumbUrl: item.thumb_url
+    });
+    setFeatured({
+      comicSlug: item.slug,
+      comicName: item.name,
+      thumbUrl: item.thumb_url
+    });
+    setSavedMessage('Đã lưu truyện đề cử.');
+    setTimeout(() => setSavedMessage(''), 2500);
+  };
 
   return (
     <div className="min-h-screen bg-primary-bg pb-20 pt-24 px-4 sm:px-6 lg:px-8">
@@ -159,6 +195,43 @@ export default function AdminDashboard() {
 
           {/* Top Comics Side Section */}
           <div className="space-y-6">
+            <div className="glass rounded-[2.5rem] p-8 border border-white/5 shadow-2xl space-y-5">
+              <h3 className="text-xl font-black text-white uppercase tracking-tight">Quản lý truyện đề cử</h3>
+              <p className="text-xs text-text-dim">Tìm truyện theo tên rồi chọn làm truyện đề cử trang chủ.</p>
+              {featured && (
+                <div className="text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+                  Đang đề cử: <span className="font-bold">{featured.comicName}</span>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder="Nhập tên truyện..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-accent"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="bg-accent text-white px-4 py-3 rounded-xl font-black uppercase text-xs tracking-widest hover:brightness-110 transition-all"
+                >
+                  {searching ? 'Đang tìm' : 'Tìm'}
+                </button>
+              </div>
+              <div className="max-h-64 overflow-y-auto space-y-2">
+                {searchResults.map((item) => (
+                  <button
+                    key={item.slug}
+                    onClick={() => saveFeaturedComic(item)}
+                    className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                  >
+                    <p className="text-sm font-bold text-white">{item.name}</p>
+                    <p className="text-[11px] text-text-dim">{item.slug}</p>
+                  </button>
+                ))}
+              </div>
+              {savedMessage && <p className="text-xs text-emerald-400 font-bold">{savedMessage}</p>}
+            </div>
+
             <div className="glass rounded-[2.5rem] p-8 border border-white/5 shadow-2xl space-y-6">
                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">

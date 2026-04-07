@@ -6,6 +6,8 @@ import { useQuery } from '@tanstack/react-query';
 import { comicService } from '@/services/comicService';
 import StoryCard, { ComicItem } from '@/components/Story/StoryCard';
 import { FaBolt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import HeroSection from '@/components/Home/HeroSection';
+import { adminService } from '@/services/adminService';
 
 function HomeLoadingSkeleton() {
   return (
@@ -27,6 +29,11 @@ function HomeContent() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['homeComicsLatest', page],
     queryFn: () => comicService.getList('truyen-moi', page),
+  });
+
+  const { data: featuredData } = useQuery({
+    queryKey: ['featuredComicConfig'],
+    queryFn: () => adminService.getFeaturedComic(),
   });
 
   if (isLoading) {
@@ -55,9 +62,26 @@ function HomeContent() {
   const totalPages = pagination?.totalItemsPerPage
     ? Math.ceil(totalItems / pagination.totalItemsPerPage)
     : 1;
+  const featuredComicItem = featuredData
+    ? ({
+        _id: featuredData.comicSlug,
+        slug: featuredData.comicSlug,
+        name: featuredData.comicName,
+        origin_name: [],
+        status: '',
+        thumb_url: featuredData.thumbUrl,
+        sub_docquyen: false,
+        category: [],
+        updatedAt: ''
+      } as ComicItem)
+    : null;
+  const featuredComics = featuredComicItem ? [featuredComicItem] : items;
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-8 py-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out">
+      {featuredComics.length > 0 && (
+        <HeroSection comics={featuredComics} imageDomain={APP_DOMAIN_CDN_IMAGE} />
+      )}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div className="flex items-center space-x-3">
           <div className="w-1.5 h-10 bg-accent rounded-full shadow-lg shadow-accent/50"></div>
