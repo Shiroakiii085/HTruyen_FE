@@ -59,7 +59,8 @@ export default function Home() {
     );
   }
 
-  const { items, APP_DOMAIN_CDN_IMAGE } = data.data;
+  const items: ComicItem[] = Array.isArray(data?.data?.items) ? data.data.items : [];
+  const APP_DOMAIN_CDN_IMAGE = data?.data?.APP_DOMAIN_CDN_IMAGE || '';
 
   const itemMapBySlug = new Map(
     items.map((comic: ComicItem) => [comic.slug?.toLowerCase(), comic])
@@ -68,24 +69,25 @@ export default function Home() {
   // Most Read Logic: Use internal stats if available, with fallback fields from home list
   const hotComics = mostReadData && mostReadData.length > 0 
     ? mostReadData
+        .filter(stat => Boolean(stat))
         .filter(stat => {
-          const slug = String(stat.comicSlug || '').toLowerCase();
-          const name = String(stat.comicName || '').toLowerCase();
+          const slug = String(stat?.comicSlug || '').toLowerCase();
+          const name = String(stat?.comicName || '').toLowerCase();
           const FORBIDDEN_KEYWORDS = ['ngôn tình', 'đam mỹ', 'romance', 'shoujo', 'gender bender', 'yuri', 'yaoi'];
           return !FORBIDDEN_KEYWORDS.some(kw => name.includes(kw) || slug.includes(kw));
         })
         .map(stat => {
-          const fallbackComic = itemMapBySlug.get(String(stat.comicSlug || '').toLowerCase());
+          const fallbackComic = itemMapBySlug.get(String(stat?.comicSlug || '').toLowerCase());
           return {
-            _id: stat.comicSlug || fallbackComic?._id || '',
-            slug: stat.comicSlug || fallbackComic?.slug || '',
-            name: stat.comicName || fallbackComic?.name || 'Đang cập nhật',
-            thumb_url: stat.thumbUrl || fallbackComic?.thumb_url || '',
+            _id: stat?.comicSlug || fallbackComic?._id || '',
+            slug: stat?.comicSlug || fallbackComic?.slug || '',
+            name: stat?.comicName || fallbackComic?.name || 'Đang cập nhật',
+            thumb_url: stat?.thumbUrl || fallbackComic?.thumb_url || '',
             chaptersLatest: fallbackComic?.chaptersLatest || [], // Chapter info is missing in stats
             status: fallbackComic?.status || '',
             sub_docquyen: fallbackComic?.sub_docquyen || false,
             category: fallbackComic?.category || [],
-            updatedAt: stat.lastReadAt || fallbackComic?.updatedAt || '',
+            updatedAt: stat?.lastReadAt || fallbackComic?.updatedAt || '',
             origin_name: fallbackComic?.origin_name || []
           } as ComicItem;
         }).slice(0, 12)
