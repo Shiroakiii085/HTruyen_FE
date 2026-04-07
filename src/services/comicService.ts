@@ -7,6 +7,8 @@ const FORBIDDEN_SLUGS = [
 
 const FORBIDDEN_KEYWORDS = ['ngôn tình', 'đam mỹ', 'romance', 'shoujo', 'gender bender', 'yuri', 'yaoi'];
 
+const COMING_SOON_KEYWORDS = ['coming soon', 'sap ra mat', 'sắp ra mắt', 'upcoming', 'soon'];
+
 const filterComics = (items: any[]) => {
   if (!items) return [];
   return items.filter(item => {
@@ -34,6 +36,13 @@ const filterCategories = (items: any[]) => {
   });
 };
 
+const isComingSoonComic = (item: any) => {
+  if (!item) return false;
+
+  const status = String(item.status || '').toLowerCase().trim();
+  return COMING_SOON_KEYWORDS.some(keyword => status.includes(keyword));
+};
+
 export const comicService = {
   getHome: async () => {
     const res = await api.get('/proxy/home');
@@ -43,9 +52,13 @@ export const comicService = {
     return res.data;
   },
   getList: async (type: string, page: number = 1) => {
-    const res = await api.get(`/proxy/danh-sach/${type}?page=${page}`);
+    const apiType = type === 'sap-ra-mat' ? 'truyen-moi' : type;
+    const res = await api.get(`/proxy/danh-sach/${apiType}?page=${page}`);
     if (res.data?.data?.items) {
-      res.data.data.items = filterComics(res.data.data.items);
+      const filteredItems = filterComics(res.data.data.items);
+      res.data.data.items = type === 'sap-ra-mat'
+        ? filteredItems.filter(isComingSoonComic)
+        : filteredItems;
     }
     return res.data;
   },

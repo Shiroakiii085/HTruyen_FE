@@ -10,6 +10,13 @@ import GuidePopup from '@/components/Home/GuidePopup';
 import XianxiaTransition from '@/components/Layout/XianxiaTransition';
 import { FaFire, FaBolt, FaBookOpen, FaStar, FaChartLine } from 'react-icons/fa';
 
+const COMING_SOON_KEYWORDS = ['coming soon', 'sap ra mat', 'sắp ra mắt', 'upcoming', 'soon'];
+
+const isComingSoonComic = (comic: ComicItem) => {
+  const status = String(comic?.status || '').toLowerCase().trim();
+  return COMING_SOON_KEYWORDS.some(keyword => status.includes(keyword));
+};
+
 export default function Home() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['homeComics'],
@@ -54,30 +61,39 @@ export default function Home() {
 
   const { items, APP_DOMAIN_CDN_IMAGE } = data.data;
 
-  // Most Read Logic: Use internal stats if available, otherwise fallback to global hot
+  const itemMapBySlug = new Map(
+    items.map((comic: ComicItem) => [comic.slug?.toLowerCase(), comic])
+  );
+
+  // Most Read Logic: Use internal stats if available, with fallback fields from home list
   const hotComics = mostReadData && mostReadData.length > 0 
     ? mostReadData
         .filter(stat => {
-          const slug = stat.comicSlug.toLowerCase();
-          const name = stat.comicName.toLowerCase();
+          const slug = String(stat.comicSlug || '').toLowerCase();
+          const name = String(stat.comicName || '').toLowerCase();
           const FORBIDDEN_KEYWORDS = ['ngôn tình', 'đam mỹ', 'romance', 'shoujo', 'gender bender', 'yuri', 'yaoi'];
           return !FORBIDDEN_KEYWORDS.some(kw => name.includes(kw) || slug.includes(kw));
         })
-        .map(stat => ({
-          _id: stat.comicSlug,
-          slug: stat.comicSlug,
-          name: stat.comicName,
-          thumb_url: stat.thumbUrl,
-          chaptersLatest: [], // Chapter info not available in stats
-          status: '',
-          category: [],
-          updatedAt: stat.lastReadAt,
-          origin_name: []
-        } as any)).slice(0, 12)
+        .map(stat => {
+          const fallbackComic = itemMapBySlug.get(String(stat.comicSlug || '').toLowerCase());
+          return {
+            _id: stat.comicSlug || fallbackComic?._id || '',
+            slug: stat.comicSlug || fallbackComic?.slug || '',
+            name: stat.comicName || fallbackComic?.name || 'Đang cập nhật',
+            thumb_url: stat.thumbUrl || fallbackComic?.thumb_url || '',
+            chaptersLatest: fallbackComic?.chaptersLatest || [], // Chapter info is missing in stats
+            status: fallbackComic?.status || '',
+            sub_docquyen: fallbackComic?.sub_docquyen || false,
+            category: fallbackComic?.category || [],
+            updatedAt: stat.lastReadAt || fallbackComic?.updatedAt || '',
+            origin_name: fallbackComic?.origin_name || []
+          } as ComicItem;
+        }).slice(0, 12)
     : items.slice(0, 12);
 
   const featuredComics = items.slice(0, 5);
-  const newComics = items.slice(6, 24);
+  const comingSoonComics = items.filter(isComingSoonComic).slice(0, 12);
+  const newComics = items.filter(comic => !isComingSoonComic(comic)).slice(6, 24);
   const fullComics = items.slice(18, 30);
 
   return (
@@ -143,6 +159,33 @@ export default function Home() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
             {newComics.map((comic: ComicItem, index: number) => (
               <StoryCard key={`new-${comic._id}-${index}`} comic={comic} imageDomain={APP_DOMAIN_CDN_IMAGE} />
+            ))}
+          </div>
+        </XianxiaTransition>
+      </section>
+
+      {/* Coming Soon Section */}
+      <section className="mb-20 relative">
+        <div className="flex items-center justify-between mb-8 pb-4 relative">
+          <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-ink-deep to-transparent opacity-80" style={{ filter: 'url(#ink-roughness)' }}></div>
+          <div className="flex items-center space-x-4">
+             <div className="w-12 h-12 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] bg-purple-500/10 rounded-full border border-purple-400/30 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)] flex items-center justify-center relative overflow-hidden">
+               <div className="absolute inset-0 bg-purple-500/5 animate-pulse"></div>
+               <FaStar className="text-purple-300 relative z-10" />
+             </div>
+             <div>
+               <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest font-[family-name:var(--font-heading)] drop-shadow-sm">
+                 <XianxiaTransition type="ink-drop" delay={700}>Truyện Sắp Ra Mắt</XianxiaTransition>
+               </h2>
+               <p className="text-[10px] md:text-xs text-mist-gray font-bold uppercase tracking-widest mt-1 italic">Danh sách coming soon</p>
+             </div>
+          </div>
+          <Link href="/danh-sach/sap-ra-mat" className="text-xs font-black text-gold-dim hover:text-purple-300 hover:underline tracking-widest transition-colors font-[family-name:var(--font-heading)]">XEM TẤT CẢ ›</Link>
+        </div>
+        <XianxiaTransition type="stagger-cards" delay={800}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+            {comingSoonComics.map((comic: ComicItem, index: number) => (
+              <StoryCard key={`soon-${comic._id}-${index}`} comic={comic} imageDomain={APP_DOMAIN_CDN_IMAGE} />
             ))}
           </div>
         </XianxiaTransition>

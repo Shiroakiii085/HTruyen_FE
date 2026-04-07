@@ -66,6 +66,14 @@ export default function Navbar() {
     });
   };
 
+  const navItems = [
+    { label: 'Trang chủ', href: '/' },
+    { label: 'Mới cập nhật', href: '/danh-sach/truyen-moi' },
+    { label: 'Truyện Hot', href: '/danh-sach/truyen-hot' },
+    { label: 'Sắp ra mắt', href: '/danh-sach/sap-ra-mat' },
+    { label: 'Thể loại', href: '/the-loai' }
+  ];
+
   return (
     <nav className="sticky top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-7xl bg-ink-deep/90 backdrop-blur-xl rounded-[4px] shadow-[0_4px_20px_rgba(26,20,16,0.7)] transition-all duration-300 translate-y-0 border border-gold-dim/40 relative">
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper-2.png')] opacity-20 pointer-events-none mix-blend-multiply rounded-[4px]"></div>
@@ -81,13 +89,13 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex flex-none items-center space-x-12 ml-16">
-            {['Trang chủ', 'Mới cập nhật', 'Truyện Hot', 'Thể loại'].map((item, idx) => (
+            {navItems.map((item, idx) => (
                 <Link 
                   key={idx}
-                  href={idx === 0 ? '/' : idx === 3 ? '/the-loai' : `/danh-sach/truyen-${idx === 1 ? 'moi' : 'hot'}`} 
+                  href={item.href}
                   className="relative text-text-muted hover:text-gold-ancient font-semibold text-sm uppercase tracking-[0.15em] transition-colors py-1.5 font-[family-name:var(--font-heading)] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-gold-ancient after:origin-left after:[clip-path:inset(0_100%_0_0)] hover:after:[clip-path:inset(0_0_0_0)] after:transition-[clip-path] after:duration-500 after:ease-out"
                 >
-                  {item}
+                  {item.label}
                 </Link>
             ))}
           </div>
@@ -219,9 +227,9 @@ export default function Navbar() {
             <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-text-dim" size={14} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {['Trang chủ', 'Mới cập nhật', 'Truyện Hot', 'Thể loại'].map((item, idx) => (
-              <Link key={idx} href={idx === 0 ? '/' : idx === 3 ? '/the-loai' : `/danh-sach/truyen-${idx === 1 ? 'moi' : 'hot'}`} className="bg-paper-aged/10 py-3 px-4 rounded-[4px] text-sm font-medium text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 border border-gold-dim/20 text-center transition-all font-[family-name:var(--font-heading)] tracking-widest uppercase">
-                {item}
+            {navItems.map((item, idx) => (
+              <Link key={idx} href={item.href} className="bg-paper-aged/10 py-3 px-4 rounded-[4px] text-sm font-medium text-mist-gray hover:text-gold-ancient hover:bg-gold-ancient/20 border border-gold-dim/20 text-center transition-all font-[family-name:var(--font-heading)] tracking-widest uppercase">
+                {item.label}
               </Link>
             ))}
           </div>

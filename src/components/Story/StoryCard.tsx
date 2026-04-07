@@ -20,8 +20,18 @@ interface StoryCardProps {
 
 export default function StoryCard({ comic, imageDomain }: StoryCardProps) {
   const safeImageDomain = imageDomain || '';
-  const imageUrl = safeImageDomain ? `${safeImageDomain}/uploads/comics/${comic.thumb_url}` : '';
+  const fallbackCover =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='480'%3E%3Crect width='100%25' height='100%25' fill='%23161a24'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239aa3b2' font-size='20' font-family='Arial'%3EHTruyen%3C/text%3E%3C/svg%3E";
+  const hasThumb = Boolean(comic.thumb_url);
+  const imageUrl = safeImageDomain && hasThumb ? `${safeImageDomain}/uploads/comics/${comic.thumb_url}` : fallbackCover;
   const latestChapter = comic.chaptersLatest && comic.chaptersLatest.length > 0 ? comic.chaptersLatest[0].chapter_name : '';
+  const displayName = comic.name?.trim() || comic.origin_name?.[0] || 'Đang cập nhật';
+  const normalizedStatus = String(comic.status || '').toLowerCase();
+  const isComingSoon =
+    normalizedStatus.includes('coming soon') ||
+    normalizedStatus.includes('sắp ra mắt') ||
+    normalizedStatus.includes('sap ra mat') ||
+    normalizedStatus.includes('upcoming');
 
   return (
     <Link 
@@ -32,8 +42,13 @@ export default function StoryCard({ comic, imageDomain }: StoryCardProps) {
       <div className="absolute inset-0 overflow-hidden">
         <img
           src={imageUrl}
-          alt={comic.name}
+          alt={displayName}
           loading="lazy"
+          onError={(e) => {
+            const target = e.currentTarget;
+            target.onerror = null;
+            target.src = fallbackCover;
+          }}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
         />
         {/* Dark Gradient Overlay */}
@@ -46,6 +61,11 @@ export default function StoryCard({ comic, imageDomain }: StoryCardProps) {
           <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg">Hot</span>
         </div>
       )}
+      {isComingSoon && (
+        <div className="absolute top-2 right-2 z-30">
+          <span className="bg-purple-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg">Coming Soon</span>
+        </div>
+      )}
       
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 z-20 space-y-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
@@ -56,7 +76,7 @@ export default function StoryCard({ comic, imageDomain }: StoryCardProps) {
         </div>
 
         <h3 className="font-bold text-white text-sm md:text-base leading-tight line-clamp-2 transition-colors group-hover:text-jade-green font-[family-name:var(--font-heading)]">
-          {comic.name}
+          {displayName}
         </h3>
         
         <div className="flex justify-between items-center pt-1 border-t border-white/10">
