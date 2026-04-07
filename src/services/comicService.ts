@@ -63,7 +63,7 @@ const paginateFilteredItems = async (
 
   while (sourcePage <= MAX_SCAN_PAGES) {
     const res = await fetchPageData(sourcePage);
-    const payload = res?.data || {};
+    const payload = res?.data?.data || {};
     const rawItems = Array.isArray(payload?.items) ? payload.items : [];
     const pagination = payload?.params?.pagination || {};
 
@@ -127,8 +127,7 @@ export const comicService = {
     return paginateFilteredItems(
       page,
       async (sourcePage: number) => {
-        const res = await api.get(`/proxy/danh-sach/${apiType}?page=${sourcePage}`);
-        return res?.data?.data || {};
+        return api.get(`/proxy/danh-sach/${apiType}?page=${sourcePage}`);
       },
       (item: any) => type === 'sap-ra-mat' ? isComingSoonComic(item) : !isComingSoonComic(item)
     );
@@ -144,8 +143,7 @@ export const comicService = {
     return paginateFilteredItems(
       page,
       async (sourcePage: number) => {
-        const res = await api.get(`/proxy/the-loai/${slug}?page=${sourcePage}`);
-        return res?.data?.data || {};
+        return api.get(`/proxy/the-loai/${slug}?page=${sourcePage}`);
       },
       (item: any) => !isComingSoonComic(item)
     );
@@ -158,8 +156,7 @@ export const comicService = {
     return paginateFilteredItems(
       page,
       async (sourcePage: number) => {
-        const res = await api.get(`/proxy/tim-kiem?keyword=${encodeURIComponent(keyword)}&page=${sourcePage}`);
-        return res?.data?.data || {};
+        return api.get(`/proxy/tim-kiem?keyword=${encodeURIComponent(keyword)}&page=${sourcePage}`);
       },
       (item: any) => !isComingSoonComic(item)
     );
