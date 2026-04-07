@@ -346,7 +346,7 @@ export default function Reader() {
             <button 
               onClick={goToPrev}
               disabled={currentIndex <= 0}
-              className="p-3 bg-white/10 rounded-full border border-white/20 text-white hover:gold-ancient hover:bg-white/20 transition-all disabled:opacity-20 translate-x-[-10px]"
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-bronze-ancient to-gold-dim text-white shadow-xl hover:scale-105 active:scale-95 disabled:grayscale disabled:opacity-50 transition-all"
             >
               <FaChevronLeft className="text-xl" />
             </button>
