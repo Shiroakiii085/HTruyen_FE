@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -7,7 +7,20 @@ import { comicService } from '@/services/comicService';
 import StoryCard, { ComicItem } from '@/components/Story/StoryCard';
 import { FaBolt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-export default function Home() {
+function HomeLoadingSkeleton() {
+  return (
+    <div className="max-w-7xl mx-auto px-6 md:px-8 py-12">
+      <div className="h-10 w-72 bg-surface-card rounded-xl mb-12 animate-pulse"></div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(i => (
+          <div key={i} className="aspect-[2/3.2] bg-surface-card rounded-2xl animate-pulse"></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HomeContent() {
   const searchParams = useSearchParams();
   const page = Number(searchParams.get('page') || '1');
 
@@ -17,16 +30,7 @@ export default function Home() {
   });
 
   if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-6 md:px-8 py-12">
-        <div className="h-10 w-72 bg-surface-card rounded-xl mb-12 animate-pulse"></div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(i => (
-            <div key={i} className="aspect-[2/3.2] bg-surface-card rounded-2xl animate-pulse"></div>
-          ))}
-        </div>
-      </div>
-    );
+    return <HomeLoadingSkeleton />;
   }
 
   if (error || !data || data.status !== 'success') {
@@ -105,5 +109,13 @@ export default function Home() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<HomeLoadingSkeleton />}>
+      <HomeContent />
+    </Suspense>
   );
 }
